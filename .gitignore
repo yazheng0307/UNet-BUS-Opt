@@ -12,3 +12,10 @@ runs/*
 runs/thesis_ch1/**/best_model.pth
 runs/thesis_ch2/**/best_model.pth
 !runs/thesis_ch2/UABCD_seed41_e60/best_model.pth
+!runs/thesis_multiseed/
+runs/thesis_multiseed/*
+!runs/thesis_multiseed/seed73/
+runs/thesis_multiseed/seed73/*
+!runs/thesis_multiseed/seed73/UABCD/
+runs/thesis_multiseed/seed73/UABCD/*
+!runs/thesis_multiseed/seed73/UABCD/best_model.pth

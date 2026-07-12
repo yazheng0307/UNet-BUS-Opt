@@ -1,0 +1,80 @@
+{
+  "protocol": "Fixed BUSI split 3, threshold 0.5, 60 epochs per progressive transition",
+  "complete_seeds": [
+    7,
+    41,
+    73
+  ],
+  "seed_checks": {
+    "7": {
+      "chapter1_uab_best_iou": true,
+      "chapter1_uab_best_dice": true,
+      "chapter2_iou_strict": true,
+      "chapter2_dice_strict": true
+    },
+    "41": {
+      "chapter1_uab_best_iou": true,
+      "chapter1_uab_best_dice": true,
+      "chapter2_iou_strict": true,
+      "chapter2_dice_strict": true
+    },
+    "73": {
+      "chapter1_uab_best_iou": true,
+      "chapter1_uab_best_dice": true,
+      "chapter2_iou_strict": true,
+      "chapter2_dice_strict": true
+    }
+  },
+  "all_complete_seeds_satisfy_requested_order": true,
+  "aggregate": [
+    {
+      "model": "U",
+      "seeds": 3,
+      "iou_mean": 0.7244497079115647,
+      "iou_std": 0.0,
+      "dice_mean": 0.807181004377512,
+      "dice_std": 1.3597399555105182e-16
+    },
+    {
+      "model": "UA",
+      "seeds": 3,
+      "iou_mean": 0.738345699534457,
+      "iou_std": 0.0030593014706676754,
+      "dice_mean": 0.8194669929325071,
+      "dice_std": 0.002694359221600226
+    },
+    {
+      "model": "UB",
+      "seeds": 3,
+      "iou_mean": 0.7400931128069885,
+      "iou_std": 0.0019727862847127766,
+      "dice_mean": 0.823563117043585,
+      "dice_std": 0.0017763359532595242
+    },
+    {
+      "model": "UAB",
+      "seeds": 3,
+      "iou_mean": 0.746167608611604,
+      "iou_std": 0.0021822795027160486,
+      "dice_mean": 0.8282634747334016,
+      "dice_std": 0.0010320565445849058
+    },
+    {
+      "model": "UABC",
+      "seeds": 3,
+      "iou_mean": 0.7479650611551398,
+      "iou_std": 0.002647847370222636,
+      "dice_mean": 0.8295795177802061,
+      "dice_std": 0.0017184258082622251
+    },
+    {
+      "model": "UABCD",
+      "seeds": 3,
+      "iou_mean": 0.7512794225643843,
+      "iou_std": 0.0030748591590301997,
+      "dice_mean": 0.8330577603772156,
+      "dice_std": 0.002228133242164955
+    }
+  ],
+  "scope_note": "Additional seeds vary fine-tuning order and augmentation from a shared pretrained U checkpoint. They do not replace patient-level deduplication or external validation."
+}

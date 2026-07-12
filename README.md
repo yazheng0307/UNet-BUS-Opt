@@ -20,8 +20,23 @@ This repository now includes a unified progressive U-Net study for BUSI split 3:
 - Independent evaluation: `evaluate_thesis_stages.py`
 - Chinese dissertation draft: `博士学位论文初稿.md` and `博士学位论文初稿.docx`
 - Figures and statistical tables: `thesis_artifacts/`
+- Literature provenance: `thesis_artifacts/literature_evidence.json`
+- Reproducibility manifest: `reproducibility_manifest.py`
+- Rebuild the Word draft: `generate_thesis_docx.py`
 
 All results use BUSI split 3, a fixed threshold of 0.5, and mean per-case IoU for checkpoint selection.
+
+The full pipeline has also been replicated with seeds 7 and 73. All three seeds (7, 41, and 73) satisfy every required ordering; the three-seed UABCD result is `75.128% +/- 0.307%` IoU and `83.306% +/- 0.223%` Dice. See `thesis_artifacts/multiseed/`.
+
+The overall best checkpoint is `runs/thesis_multiseed/seed73/UABCD/best_model.pth` (`75.442%` IoU, `83.382%` Dice). It is tracked with Git LFS.
+
+Create an integrity manifest for the exact split, dataset files, checkpoints, and reported metrics:
+
+```powershell
+E:\anaconda3\envs\my_pytorch\python.exe reproducibility_manifest.py
+```
+
+The current replication uses three seeds from a shared pretrained U checkpoint. It does not prove patient-level, external-dataset, multi-device, or clinical generalization.
 
 ![ushape](img/ushape.png)
 

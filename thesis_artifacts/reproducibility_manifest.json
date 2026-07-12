@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "git_revision": "4beac8f74737fe31b278f6f0b4efa016c5d84c6a",
+  "protocol": {
+    "dataset": "BUSI lesion subset",
+    "split": 3,
+    "train_count": 452,
+    "val_count": 195,
+    "threshold": 0.5,
+    "reported_metrics": [
+      "mean_per_case_iou",
+      "mean_per_case_dice"
+    ],
+    "checkpoint_selection": "mean_per_case_iou"
+  },
+  "data_integrity": {
+    "train_list": {
+      "path": "data/busi/busi_train3.txt",
+      "sha256": "92446358c6224b28410490ce5e669c9b5c0718786e991f1e1dfad06496aa454e"
+    },
+    "val_list": {
+      "path": "data/busi/busi_val3.txt",
+      "sha256": "63c4ff105c78dc66768c64e945cd854c2ebd79b57e6ce3acd656249c5c58add0"
+    },
+    "aggregate_image_mask_sha256": "2abda9f467481bc5a2a01d3d15d97fc8642b453e89f2273fb884d7ae0dec15cd",
+    "case_name_overlap": [],
+    "missing_files": []
+  },
+  "checkpoints": {
+    "U": {
+      "path": "runs/busi_opt_ch1/screen100_A0/best_model.pth",
+      "bytes": 36046010,
+      "sha256": "e7b3b3235de3362da40c6f8c26582fce9413f0d7b555abb7a288aa91aa9405f4"
+    },
+    "UA": {
+      "path": "runs/thesis_ch1/UA_seed41_e60/best_model.pth",
+      "bytes": 45506395,
+      "sha256": "b492e1d2e2c4aafd15a0f87b9ee6a32459e189e072c14cbc9e59aaf33db8a4fe"
+    },
+    "UB": {
+      "path": "runs/thesis_ch1/UB_seed41_e60/best_model.pth",
+      "bytes": 45506395,
+      "sha256": "5f4272fa68e0a3c1368e6a3401bc592d38940be51fa0d1518e393b6c79029a74"
+    },
+    "UAB": {
+      "path": "runs/thesis_ch1/UAB_seed41_e60/best_model.pth",
+      "bytes": 45506395,
+      "sha256": "1b755ecf85719b83f5587c1e54f94eb97849da46593134592d67c5e8c65da3f6"
+    },
+    "UABC": {
+      "path": "runs/thesis_ch2/UABC_seed41_e60/best_model.pth",
+      "bytes": 45506395,
+      "sha256": "3df2f86ca52b8e598685425318205851887e4fff2ef16e8e898953580698242a"
+    },
+    "UABCD": {
+      "path": "runs/thesis_ch2/UABCD_seed41_e60/best_model.pth",
+      "bytes": 45506395,
+      "sha256": "e9d424134673b6f45831db996a52483edf98a7c357d2928bdf9e8c45338000c6"
+    },
+    "UABCD_best_seed73": {
+      "path": "runs/thesis_multiseed/seed73/UABCD/best_model.pth",
+      "bytes": 45506395,
+      "sha256": "5f85115a772e7336246cc7c825f8d7493ad7776671e593637d5c9657956d970d"
+    }
+  },
+  "missing_checkpoints": [],
+  "training": {
+    "UA": {
+      "seed": 41,
+      "epochs": 60,
+      "best_epoch": 33,
+      "init_checkpoint": "./runs/busi_opt_ch1/screen100_A0/best_model.pth",
+      "new_module": "A",
+      "base_lr": 2e-05,
+      "module_lr": 0.0001,
+      "batch_size": 8,
+      "image_size": 256
+    },
+    "UB": {
+      "seed": 41,
+      "epochs": 60,
+      "best_epoch": 45,
+      "init_checkpoint": "./runs/busi_opt_ch1/screen100_A0/best_model.pth",
+      "new_module": "B",
+      "base_lr": 2e-05,
+      "module_lr": 0.0001,
+      "batch_size": 8,
+      "image_size": 256
+    },
+    "UAB": {
+      "seed": 41,
+      "epochs": 60,
+      "best_epoch": 41,
+      "init_checkpoint": "./runs/thesis_ch1/UB_seed41_e60/best_model.pth",
+      "new_module": "A",
+      "base_lr": 2e-05,
+      "module_lr": 0.0001,
+      "batch_size": 8,
+      "image_size": 256
+    },
+    "UABC": {
+      "seed": 41,
+      "epochs": 60,
+      "best_epoch": 37,
+      "init_checkpoint": "./runs/thesis_ch1/UAB_seed41_e60/best_model.pth",
+      "new_module": "C",
+      "base_lr": 2e-05,
+      "module_lr": 0.0001,
+      "batch_size": 8,
+      "image_size": 256
+    },
+    "UABCD": {
+      "seed": 41,
+      "epochs": 60,
+      "best_epoch": 8,
+      "init_checkpoint": "./runs/thesis_ch2/UABC_seed41_e60/best_model.pth",
+      "new_module": "D",
+      "base_lr": 2e-05,
+      "module_lr": 0.0001,
+      "batch_size": 8,
+      "image_size": 256
+    }
+  },
+  "metrics": {
+    "U": {
+      "iou": 0.7244497079115647,
+      "dice": 0.8071810043775118
+    },
+    "UA": {
+      "iou": 0.7362157888901539,
+      "dice": 0.8181726535161337
+    },
+    "UB": {
+      "iou": 0.7419274550217848,
+      "dice": 0.8253667183411427
+    },
+    "UAB": {
+      "iou": 0.7484731888159727,
+      "dice": 0.8294292798409095
+    },
+    "UABC": {
+      "iou": 0.7493209245877388,
+      "dice": 0.8302194155179538
+    },
+    "UABCD": {
+      "iou": 0.7511501257236187,
+      "dice": 0.8348036215855525
+    }
+  },
+  "checks": {
+    "train_count_452": true,
+    "val_count_195": true,
+    "case_names_disjoint": true,
+    "all_dataset_files_present": true,
+    "all_stage_checkpoints_present_locally": true,
+    "chapter1_uab_best_iou": true,
+    "chapter1_uab_best_dice": true,
+    "chapter2_iou_strict": true,
+    "chapter2_dice_strict": true,
+    "three_complete_seeds_preserve_order": true
+  },
+  "passed": true,
+  "scope_note": "The manifest proves local artifact integrity and the requested single-seed split-3 ordering. It does not prove multi-seed, deduplicated-patient, external-dataset, or clinical generalization.",
+  "multiseed": {
+    "complete_seeds": [
+      7,
+      41,
+      73
+    ],
+    "all_complete_seeds_satisfy_requested_order": true,
+    "summary_sha256": "bfb43f1be6df603a7f97f8859adc5346819e2f199a767b7a3a1f80275d3ba3f9"
+  }
+}

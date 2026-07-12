@@ -100,15 +100,32 @@ def main():
     fields = ["epoch"] + [
         prefix + name for prefix in ("train_", "val_") for name in metric_names
     ] + ["base_lr", "module_lr"]
-    best_iou = -1.0
-    best_dice = -1.0
+    with torch.no_grad():
+        initial_val_metrics = run_epoch(model, val_loader, criterion, device)
+    best_iou = initial_val_metrics["iou"]
+    best_dice = initial_val_metrics["dice"]
     best_epoch = 0
     started = time.time()
     history_path = os.path.join(args.output_dir, "history.csv")
     checkpoint_path = os.path.join(args.output_dir, "best_model.pth")
+    torch.save(model.state_dict(), checkpoint_path)
     with open(history_path, "w", newline="", encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=fields)
         writer.writeheader()
+        initial_row = {
+            "epoch": 0,
+            "base_lr": optimizer.param_groups[0]["lr"],
+            "module_lr": optimizer.param_groups[-1]["lr"] if len(optimizer.param_groups) > 1 else 0.0,
+        }
+        initial_row.update({"train_" + name: "" for name in metric_names})
+        initial_row.update({"val_" + key: value for key, value in initial_val_metrics.items()})
+        writer.writerow(initial_row)
+        file.flush()
+        print(
+            "epoch [0/{}] val_IoU={:.4f} val_Dice={:.4f}".format(
+                args.epochs, initial_val_metrics["iou"], initial_val_metrics["dice"]
+            ), flush=True,
+        )
         for epoch in range(1, args.epochs + 1):
             train_metrics = run_epoch(model, train_loader, criterion, device, optimizer, scaler)
             with torch.no_grad():

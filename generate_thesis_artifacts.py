@@ -198,6 +198,38 @@ def delta_plot(metrics):
     plt.close(fig)
 
 
+def multiseed_plot():
+    path = os.path.join(OUTPUT_DIR, "multiseed", "aggregate_metrics.csv")
+    if not os.path.isfile(path):
+        return
+    frame = pd.read_csv(path)
+    seed_count = int(frame["seeds"].max())
+    names = frame["model"].tolist()
+    x = np.arange(len(names))
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4.8))
+    for axis, metric, color in (
+        (axes[0], "iou", "#4C78A8"),
+        (axes[1], "dice", "#F28E2B"),
+    ):
+        means = 100 * frame[metric + "_mean"].to_numpy()
+        standard_deviations = 100 * frame[metric + "_std"].to_numpy()
+        axis.errorbar(
+            x, means, yerr=standard_deviations, fmt="o-", color=color,
+            linewidth=1.8, markersize=6, capsize=4,
+        )
+        axis.set_xticks(x, names)
+        axis.set_ylabel("{} (%)".format(metric.upper()))
+        axis.set_title("{}-seed mean +/- standard deviation".format(seed_count))
+        axis.grid(axis="y", alpha=0.22)
+        for position, value in zip(x, means):
+            axis.text(position, value + 0.12, "{:.2f}".format(value),
+                      ha="center", va="bottom", fontsize=8)
+    fig.suptitle("Random-seed replication on fixed BUSI split 3 (n={})".format(seed_count))
+    fig.tight_layout()
+    fig.savefig(os.path.join(FIGURE_DIR, "fig09_multiseed_replication.png"), bbox_inches="tight")
+    plt.close(fig)
+
+
 def architecture_figure():
     fig, ax = plt.subplots(figsize=(14.5, 3.3))
     ax.set_xlim(0, 14.5)
@@ -335,6 +367,7 @@ def main():
     case_distribution(metrics)
     paired_statistics(metrics)
     delta_plot(metrics)
+    multiseed_plot()
     complexity_table()
     qualitative_figure(metrics)
     print("Thesis artifacts written to {}".format(os.path.abspath(OUTPUT_DIR)), flush=True)

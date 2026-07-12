@@ -1,0 +1,40 @@
+{
+  "verified_on": "2026-07-13",
+  "records": [
+    {
+      "key": "Zhang2024SFRecSAM",
+      "citation": "Zhang W, Wu H, Qin J. Domesticating SAM for Breast Ultrasound Image Segmentation via Spatial-Frequency Fusion and Uncertainty Correction. ECCV 2024, LNCS 15069: 20-37.",
+      "doi": "10.1007/978-3-031-73337-6_2",
+      "authoritative_url": "https://link.springer.com/chapter/10.1007/978-3-031-73337-6_2",
+      "relevance": "Uncertainty correction and separated false-positive/false-negative correction motivate module D.",
+      "distinction": "UDER operates as an identity-initialized CNN refinement head and combines prediction entropy with multiscale disagreement; it is not SF-RecSAM or a SAM adaptation."
+    },
+    {
+      "key": "Sun2025CAUNet",
+      "citation": "Sun D, Dong C, Yan Y, et al. Challenge-aware U-net for breast lesion segmentation in ultrasound images. Pattern Recognition, 2025, 168: 111851.",
+      "doi": "10.1016/j.patcog.2025.111851",
+      "authoritative_url": "https://www.sciencedirect.com/science/article/abs/pii/S0031320325005114",
+      "relevance": "Three ultrasound challenges, adaptive aggregation, and channel graph reasoning motivate modules A and B.",
+      "distinction": "TriCAR inserts lightweight shared-backbone experts instead of three complete encoders; CGR-Bridge uses a bounded zero-initialized residual for parameter-compatible progressive training."
+    },
+    {
+      "key": "Yang2025PBNet",
+      "citation": "Yang X, Zhang J, Ou Y, et al. Multilevel perception boundary-guided network for breast lesion segmentation in ultrasound images. Medical Physics, 2025, 52(5): 3117-3134.",
+      "doi": "10.1002/mp.17647",
+      "pmid": "39887423",
+      "authoritative_url": "https://pubmed.ncbi.nlm.nih.gov/39887423/",
+      "relevance": "Morphological boundary extraction and boundary-guided fusion support explicit geometry modeling in module C.",
+      "distinction": "BD-CoRefine jointly predicts a boundary map and a signed distance field, then applies an identity-initialized geometry residual; PBNet uses MGPM, BGM, and boundary-enhanced loss."
+    },
+    {
+      "key": "Pawlowska2023BUSILetter",
+      "citation": "Pawlowska A, Karwat P, Zolek N. Letter to the Editor. Re: Dataset of breast ultrasound images by W. Al-Dhabyani, M. Gomaa, H. Khaled & A. Fahmy. Data in Brief, 2023, 48: 109247.",
+      "doi": "10.1016/j.dib.2023.109247",
+      "pmid": "37383756",
+      "authoritative_url": "https://pubmed.ncbi.nlm.nih.gov/37383756/",
+      "relevance": "Supports explicit disclosure of BUSI duplicate and annotation-quality concerns.",
+      "distinction": "The project additionally audits the fixed split 3 for exact and perceptually near-duplicate cross-split images."
+    }
+  ],
+  "integrity_note": "Metadata was checked against publisher or PubMed pages. This file records provenance and design influence; it is not evidence that the proposed modules are globally novel."
+}
