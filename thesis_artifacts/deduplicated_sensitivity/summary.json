@@ -1,0 +1,444 @@
+{
+  "audit_path": "runs/busi_split3_audit.json",
+  "definition": {
+    "phash_distance_max": 4,
+    "thumbnail_correlation_min": 0.98,
+    "cross_split_high_confidence_pairs": 24
+  },
+  "full_validation_cases": 195,
+  "excluded_validation_cases": 20,
+  "clean_validation_cases": 175,
+  "excluded_case_names": [
+    "benign (13)",
+    "benign (135)",
+    "benign (139)",
+    "benign (17)",
+    "benign (203)",
+    "benign (206)",
+    "benign (210)",
+    "benign (225)",
+    "benign (232)",
+    "benign (249)",
+    "benign (261)",
+    "benign (290)",
+    "benign (297)",
+    "benign (300)",
+    "benign (412)",
+    "benign (44)",
+    "benign (65)",
+    "malignant (118)",
+    "malignant (18)",
+    "malignant (9)"
+  ],
+  "seeds": [
+    7,
+    41,
+    73
+  ],
+  "per_seed_metrics": {
+    "7": {
+      "full": {
+        "U": {
+          "iou": 0.7244497095944568,
+          "dice": 0.8071810023183975
+        },
+        "UA": {
+          "iou": 0.7369699711494063,
+          "dice": 0.8176640356424288
+        },
+        "UB": {
+          "iou": 0.7380062084572343,
+          "dice": 0.8218153666894884
+        },
+        "UAB": {
+          "iou": 0.744134157389674,
+          "dice": 0.8274665365519855
+        },
+        "UABC": {
+          "iou": 0.7449138793354088,
+          "dice": 0.8276329449855601
+        },
+        "UABCD": {
+          "iou": 0.7482712503982314,
+          "dice": 0.8305482073287014
+        }
+      },
+      "clean_without_cross_split_near_duplicates": {
+        "U": {
+          "iou": 0.7163388903884129,
+          "dice": 0.8025001682919228
+        },
+        "UA": {
+          "iou": 0.7301835125938178,
+          "dice": 0.8140817812762675
+        },
+        "UB": {
+          "iou": 0.7313111037467103,
+          "dice": 0.8186230161039852
+        },
+        "UAB": {
+          "iou": 0.7382537788683649,
+          "dice": 0.8247526648107217
+        },
+        "UABC": {
+          "iou": 0.7380287606295781,
+          "dice": 0.823699676280048
+        },
+        "UABCD": {
+          "iou": 0.7408371699475005,
+          "dice": 0.8259107398780582
+        }
+      },
+      "near_duplicate_exposed": {
+        "U": {
+          "iou": 0.7954193776473403,
+          "dice": 0.84813830005005
+        },
+        "UA": {
+          "iou": 0.7963514835108072,
+          "dice": 0.8490087613463402
+        },
+        "UB": {
+          "iou": 0.7965883746743202,
+          "dice": 0.8497484343126416
+        },
+        "UAB": {
+          "iou": 0.7955874694511295,
+          "dice": 0.851212914288044
+        },
+        "UABC": {
+          "iou": 0.8051586680114269,
+          "dice": 0.8620490461587906
+        },
+        "UABCD": {
+          "iou": 0.8133194543421268,
+          "dice": 0.8711260475218296
+        }
+      }
+    },
+    "41": {
+      "full": {
+        "U": {
+          "iou": 0.7244497095944568,
+          "dice": 0.8071810023183975
+        },
+        "UA": {
+          "iou": 0.7362157801618162,
+          "dice": 0.8181726499936502
+        },
+        "UB": {
+          "iou": 0.74192745866169,
+          "dice": 0.825366710557216
+        },
+        "UAB": {
+          "iou": 0.748473184395012,
+          "dice": 0.8294292796753765
+        },
+        "UABC": {
+          "iou": 0.7493209303968137,
+          "dice": 0.8302194133892946
+        },
+        "UABCD": {
+          "iou": 0.7511501227930785,
+          "dice": 0.8348036264208096
+        }
+      },
+      "clean_without_cross_split_near_duplicates": {
+        "U": {
+          "iou": 0.7163388903884129,
+          "dice": 0.8025001682919228
+        },
+        "UA": {
+          "iou": 0.7290508114464775,
+          "dice": 0.8141567036427751
+        },
+        "UB": {
+          "iou": 0.735638030954355,
+          "dice": 0.8225502877161125
+        },
+        "UAB": {
+          "iou": 0.7421256254844408,
+          "dice": 0.826504308130809
+        },
+        "UABC": {
+          "iou": 0.742365849445452,
+          "dice": 0.8260469028901952
+        },
+        "UABCD": {
+          "iou": 0.7446583729684592,
+          "dice": 0.8315690539798805
+        }
+      },
+      "near_duplicate_exposed": {
+        "U": {
+          "iou": 0.7954193776473403,
+          "dice": 0.84813830005005
+        },
+        "UA": {
+          "iou": 0.7989092564210296,
+          "dice": 0.8533121805638075
+        },
+        "UB": {
+          "iou": 0.7969599511008709,
+          "dice": 0.8500104104168713
+        },
+        "UAB": {
+          "iou": 0.80401432486251,
+          "dice": 0.8550227806903422
+        },
+        "UABC": {
+          "iou": 0.8101778887212276,
+          "dice": 0.8667288802564144
+        },
+        "UABCD": {
+          "iou": 0.8079529337584972,
+          "dice": 0.8631061352789402
+        }
+      }
+    },
+    "73": {
+      "full": {
+        "U": {
+          "iou": 0.7244497095944568,
+          "dice": 0.8071810023183975
+        },
+        "UA": {
+          "iou": 0.7418513431432331,
+          "dice": 0.8225642825283429
+        },
+        "UB": {
+          "iou": 0.7403456762333731,
+          "dice": 0.8235072675945304
+        },
+        "UAB": {
+          "iou": 0.7458954866055878,
+          "dice": 0.8278946195788491
+        },
+        "UABC": {
+          "iou": 0.7496603867043338,
+          "dice": 0.8308861894632812
+        },
+        "UABCD": {
+          "iou": 0.7544168951008371,
+          "dice": 0.8338214688403672
+        }
+      },
+      "clean_without_cross_split_near_duplicates": {
+        "U": {
+          "iou": 0.7163388903884129,
+          "dice": 0.8025001682919228
+        },
+        "UA": {
+          "iou": 0.7358459241426054,
+          "dice": 0.8197752910450536
+        },
+        "UB": {
+          "iou": 0.7340215114978829,
+          "dice": 0.8206077516127932
+        },
+        "UAB": {
+          "iou": 0.7399016794388809,
+          "dice": 0.8253270099883594
+        },
+        "UABC": {
+          "iou": 0.7432727644010986,
+          "dice": 0.8278996476162365
+        },
+        "UABCD": {
+          "iou": 0.7484330382802437,
+          "dice": 0.8310864682408096
+        }
+      },
+      "near_duplicate_exposed": {
+        "U": {
+          "iou": 0.7954193776473403,
+          "dice": 0.84813830005005
+        },
+        "UA": {
+          "iou": 0.794398759398726,
+          "dice": 0.8469679580071243
+        },
+        "UB": {
+          "iou": 0.7956821176689118,
+          "dice": 0.8488780324347317
+        },
+        "UAB": {
+          "iou": 0.7983412993142729,
+          "dice": 0.850361203495634
+        },
+        "UABC": {
+          "iou": 0.8055520818576412,
+          "dice": 0.8570184306249218
+        },
+        "UABCD": {
+          "iou": 0.8067756422810286,
+          "dice": 0.8577527240864962
+        }
+      }
+    }
+  },
+  "three_seed_mean_metrics": {
+    "full": {
+      "U": {
+        "iou": 0.7244497095944568,
+        "dice": 0.8071810023183975
+      },
+      "UA": {
+        "iou": 0.7383456981514852,
+        "dice": 0.8194669893881407
+      },
+      "UB": {
+        "iou": 0.7400931144507658,
+        "dice": 0.8235631149470782
+      },
+      "UAB": {
+        "iou": 0.7461676094634245,
+        "dice": 0.8282634786020705
+      },
+      "UABC": {
+        "iou": 0.747965065478852,
+        "dice": 0.8295795159460453
+      },
+      "UABCD": {
+        "iou": 0.7512794227640489,
+        "dice": 0.8330577675299594
+      }
+    },
+    "clean_without_cross_split_near_duplicates": {
+      "U": {
+        "iou": 0.7163388903884128,
+        "dice": 0.8025001682919228
+      },
+      "UA": {
+        "iou": 0.7316934160609669,
+        "dice": 0.8160045919880322
+      },
+      "UB": {
+        "iou": 0.733656882066316,
+        "dice": 0.820593685144297
+      },
+      "UAB": {
+        "iou": 0.7400936945972288,
+        "dice": 0.8255279943099634
+      },
+      "UABC": {
+        "iou": 0.7412224581587096,
+        "dice": 0.8258820755954933
+      },
+      "UABCD": {
+        "iou": 0.7446428603987344,
+        "dice": 0.8295220873662493
+      }
+    },
+    "near_duplicate_exposed": {
+      "U": {
+        "iou": 0.7954193776473403,
+        "dice": 0.8481383000500499
+      },
+      "UA": {
+        "iou": 0.7965531664435209,
+        "dice": 0.8497629666390907
+      },
+      "UB": {
+        "iou": 0.7964101478147009,
+        "dice": 0.8495456257214148
+      },
+      "UAB": {
+        "iou": 0.7993143645426374,
+        "dice": 0.8521989661580068
+      },
+      "UABC": {
+        "iou": 0.8069628795300986,
+        "dice": 0.8619321190133755
+      },
+      "UABCD": {
+        "iou": 0.8093493434605508,
+        "dice": 0.8639949689624219
+      }
+    }
+  },
+  "per_seed_ordering_checks": {
+    "7": {
+      "full": {
+        "chapter1_uab_best_iou": true,
+        "chapter1_uab_best_dice": true,
+        "chapter2_iou_strict": true,
+        "chapter2_dice_strict": true
+      },
+      "clean_without_cross_split_near_duplicates": {
+        "chapter1_uab_best_iou": true,
+        "chapter1_uab_best_dice": true,
+        "chapter2_iou_strict": false,
+        "chapter2_dice_strict": false
+      },
+      "near_duplicate_exposed": {
+        "chapter1_uab_best_iou": false,
+        "chapter1_uab_best_dice": true,
+        "chapter2_iou_strict": true,
+        "chapter2_dice_strict": true
+      }
+    },
+    "41": {
+      "full": {
+        "chapter1_uab_best_iou": true,
+        "chapter1_uab_best_dice": true,
+        "chapter2_iou_strict": true,
+        "chapter2_dice_strict": true
+      },
+      "clean_without_cross_split_near_duplicates": {
+        "chapter1_uab_best_iou": true,
+        "chapter1_uab_best_dice": true,
+        "chapter2_iou_strict": true,
+        "chapter2_dice_strict": false
+      },
+      "near_duplicate_exposed": {
+        "chapter1_uab_best_iou": true,
+        "chapter1_uab_best_dice": true,
+        "chapter2_iou_strict": false,
+        "chapter2_dice_strict": false
+      }
+    },
+    "73": {
+      "full": {
+        "chapter1_uab_best_iou": true,
+        "chapter1_uab_best_dice": true,
+        "chapter2_iou_strict": true,
+        "chapter2_dice_strict": true
+      },
+      "clean_without_cross_split_near_duplicates": {
+        "chapter1_uab_best_iou": true,
+        "chapter1_uab_best_dice": true,
+        "chapter2_iou_strict": true,
+        "chapter2_dice_strict": true
+      },
+      "near_duplicate_exposed": {
+        "chapter1_uab_best_iou": true,
+        "chapter1_uab_best_dice": true,
+        "chapter2_iou_strict": true,
+        "chapter2_dice_strict": true
+      }
+    }
+  },
+  "three_seed_mean_ordering_checks": {
+    "full": {
+      "chapter1_uab_best_iou": true,
+      "chapter1_uab_best_dice": true,
+      "chapter2_iou_strict": true,
+      "chapter2_dice_strict": true
+    },
+    "clean_without_cross_split_near_duplicates": {
+      "chapter1_uab_best_iou": true,
+      "chapter1_uab_best_dice": true,
+      "chapter2_iou_strict": true,
+      "chapter2_dice_strict": true
+    },
+    "near_duplicate_exposed": {
+      "chapter1_uab_best_iou": true,
+      "chapter1_uab_best_dice": true,
+      "chapter2_iou_strict": true,
+      "chapter2_dice_strict": true
+    }
+  },
+  "clean_subset_three_seed_mean_preserves_all_required_ordering": true,
+  "scope_note": "This post-hoc sensitivity analysis removes validation images with high-confidence cross-split visual near duplicates. It does not reconstruct patient identities, retrain on a patient-level split, or establish external generalization."
+}

@@ -171,8 +171,9 @@ def main():
         "checks": checks,
         "passed": all(checks.values()),
         "scope_note": (
-            "The manifest proves local artifact integrity and the requested single-seed split-3 ordering. "
-            "It does not prove multi-seed, deduplicated-patient, external-dataset, or clinical generalization."
+            "The manifest proves local artifact integrity, three-seed split-3 ordering, and a "
+            "post-hoc near-duplicate exclusion sensitivity result. It does not prove patient-level "
+            "independence, external-dataset generalization, or clinical utility."
         ),
     }
     multiseed_path = ROOT / "thesis_artifacts/multiseed/summary.json"
@@ -189,6 +190,22 @@ def main():
             len(multiseed["complete_seeds"]) >= 3
             and multiseed["all_complete_seeds_satisfy_requested_order"]
         )
+        report["passed"] = all(checks.values())
+    sensitivity_path = ROOT / "thesis_artifacts/deduplicated_sensitivity/summary.json"
+    if sensitivity_path.is_file():
+        sensitivity = read_json(sensitivity_path)
+        report["deduplicated_sensitivity"] = {
+            "full_validation_cases": sensitivity["full_validation_cases"],
+            "excluded_validation_cases": sensitivity["excluded_validation_cases"],
+            "clean_validation_cases": sensitivity["clean_validation_cases"],
+            "clean_subset_three_seed_mean_preserves_all_required_ordering": sensitivity[
+                "clean_subset_three_seed_mean_preserves_all_required_ordering"
+            ],
+            "summary_sha256": sha256(sensitivity_path),
+        }
+        checks["deduplicated_clean_subset_three_seed_ordering"] = sensitivity[
+            "clean_subset_three_seed_mean_preserves_all_required_ordering"
+        ]
         report["passed"] = all(checks.values())
     output = ROOT / args.output
     output.parent.mkdir(parents=True, exist_ok=True)

@@ -61,6 +61,10 @@ def main():
         "./runs/thesis_multiseed/seed73/UABCD/evaluation/metrics.json", encoding="utf-8"
     ) as file:
         seed73_best = json.load(file)
+    with open(
+        "./thesis_artifacts/deduplicated_sensitivity/summary.json", encoding="utf-8"
+    ) as file:
+        deduplicated = json.load(file)
     identity_differences = identity_transition_differences()
 
     checks = {
@@ -87,13 +91,13 @@ def main():
         ),
         "markdown_draft_exists": os.path.isfile("./博士学位论文初稿.md"),
         "word_draft_exists": os.path.isfile("./博士学位论文初稿.docx"),
-        "word_draft_contains_nine_images": docx_media_count(
+        "word_draft_contains_ten_images": docx_media_count(
             "./博士学位论文初稿.docx"
-        ) >= 9,
-        "at_least_nine_figures": len([
+        ) >= 10,
+        "at_least_ten_figures": len([
             name for name in os.listdir("./thesis_artifacts/figures")
             if name.lower().endswith(".png") and name.startswith("fig")
-        ]) >= 9,
+        ]) >= 10,
         "reproducibility_manifest_passed": manifest["passed"],
         "four_recent_sources_verified": (
             len(literature["records"]) >= 4
@@ -106,6 +110,12 @@ def main():
                 "all_complete_seeds_satisfy_requested_order", False
             )
         ),
+        "deduplicated_clean_subset_has_175_cases": (
+            deduplicated["clean_validation_cases"] == 175
+        ),
+        "deduplicated_three_seed_mean_preserves_order": deduplicated[
+            "clean_subset_three_seed_mean_preserves_all_required_ordering"
+        ],
         "all_progressive_transitions_identity_initialized": all(
             difference == 0.0 for difference in identity_differences.values()
         ),

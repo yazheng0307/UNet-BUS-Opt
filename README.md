@@ -22,6 +22,7 @@ This repository now includes a unified progressive U-Net study for BUSI split 3:
 - Figures and statistical tables: `thesis_artifacts/`
 - Literature provenance: `thesis_artifacts/literature_evidence.json`
 - Reproducibility manifest: `reproducibility_manifest.py`
+- Near-duplicate sensitivity analysis: `analyze_deduplicated_sensitivity.py`
 - Rebuild the Word draft: `generate_thesis_docx.py`
 
 All results use BUSI split 3, a fixed threshold of 0.5, and mean per-case IoU for checkpoint selection.
@@ -30,10 +31,13 @@ The full pipeline has also been replicated with seeds 7 and 73. All three seeds 
 
 The overall best checkpoint is `runs/thesis_multiseed/seed73/UABCD/best_model.pth` (`75.442%` IoU, `83.382%` Dice). It is tracked with Git LFS.
 
+The split audit identifies 20 validation cases exposed to high-confidence cross-split visual near duplicates. On the remaining 175-case clean subset, the three-seed UABCD mean is `74.464%` IoU and `82.952%` Dice; all required aggregate orderings remain true. Individual-seed analysis still shows that module C can lose its incremental gain, so this sensitivity test is not presented as a patient-level split.
+
 Create an integrity manifest for the exact split, dataset files, checkpoints, and reported metrics:
 
 ```powershell
 E:\anaconda3\envs\my_pytorch\python.exe reproducibility_manifest.py
+E:\anaconda3\envs\my_pytorch\python.exe analyze_deduplicated_sensitivity.py
 ```
 
 The current replication uses three seeds from a shared pretrained U checkpoint. It does not prove patient-level, external-dataset, multi-device, or clinical generalization.

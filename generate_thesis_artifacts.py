@@ -230,6 +230,37 @@ def multiseed_plot():
     plt.close(fig)
 
 
+def deduplicated_sensitivity_plot():
+    path = os.path.join(OUTPUT_DIR, "deduplicated_sensitivity", "summary.json")
+    if not os.path.isfile(path):
+        return
+    with open(path, encoding="utf-8") as file:
+        report = json.load(file)
+    metrics = report["three_seed_mean_metrics"]
+    names = ["U", "UA", "UB", "UAB", "UABC", "UABCD"]
+    subsets = [
+        ("full", "Full validation (n=195)", "#4C78A8"),
+        ("clean_without_cross_split_near_duplicates", "Clean subset (n=175)", "#59A14F"),
+        ("near_duplicate_exposed", "Near-duplicate exposed (n=20)", "#E15759"),
+    ]
+    x = np.arange(len(names))
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4.8))
+    for axis, metric in zip(axes, ("iou", "dice")):
+        for subset, label, color in subsets:
+            values = [100 * metrics[subset][name][metric] for name in names]
+            axis.plot(x, values, marker="o", linewidth=1.8, markersize=5,
+                      label=label, color=color)
+        axis.set_xticks(x, names)
+        axis.set_ylabel("{} (%)".format(metric.upper()))
+        axis.set_title("Three-seed mean {}".format(metric.upper()))
+        axis.grid(alpha=0.22)
+    axes[1].legend(frameon=False, fontsize=8)
+    fig.suptitle("Sensitivity to high-confidence cross-split visual near duplicates")
+    fig.tight_layout()
+    fig.savefig(os.path.join(FIGURE_DIR, "fig10_deduplicated_sensitivity.png"), bbox_inches="tight")
+    plt.close(fig)
+
+
 def architecture_figure():
     fig, ax = plt.subplots(figsize=(14.5, 3.3))
     ax.set_xlim(0, 14.5)
@@ -368,6 +399,7 @@ def main():
     paired_statistics(metrics)
     delta_plot(metrics)
     multiseed_plot()
+    deduplicated_sensitivity_plot()
     complexity_table()
     qualitative_figure(metrics)
     print("Thesis artifacts written to {}".format(os.path.abspath(OUTPUT_DIR)), flush=True)

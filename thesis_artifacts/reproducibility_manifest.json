@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "git_revision": "4beac8f74737fe31b278f6f0b4efa016c5d84c6a",
+  "git_revision": "4b734ca2377737c047893fd36d97b1fb0571e144",
   "protocol": {
     "dataset": "BUSI lesion subset",
     "split": 3,
@@ -157,10 +157,11 @@
     "chapter1_uab_best_dice": true,
     "chapter2_iou_strict": true,
     "chapter2_dice_strict": true,
-    "three_complete_seeds_preserve_order": true
+    "three_complete_seeds_preserve_order": true,
+    "deduplicated_clean_subset_three_seed_ordering": true
   },
   "passed": true,
-  "scope_note": "The manifest proves local artifact integrity and the requested single-seed split-3 ordering. It does not prove multi-seed, deduplicated-patient, external-dataset, or clinical generalization.",
+  "scope_note": "The manifest proves local artifact integrity, three-seed split-3 ordering, and a post-hoc near-duplicate exclusion sensitivity result. It does not prove patient-level independence, external-dataset generalization, or clinical utility.",
   "multiseed": {
     "complete_seeds": [
       7,
@@ -169,5 +170,12 @@
     ],
     "all_complete_seeds_satisfy_requested_order": true,
     "summary_sha256": "bfb43f1be6df603a7f97f8859adc5346819e2f199a767b7a3a1f80275d3ba3f9"
+  },
+  "deduplicated_sensitivity": {
+    "full_validation_cases": 195,
+    "excluded_validation_cases": 20,
+    "clean_validation_cases": 175,
+    "clean_subset_three_seed_mean_preserves_all_required_ordering": true,
+    "summary_sha256": "1c7bcceedab9bcc4b19f8686c5f230162b607525daf343f3b5eb078f8219dd51"
   }
 }

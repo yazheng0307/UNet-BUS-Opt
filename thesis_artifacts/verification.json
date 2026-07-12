@@ -10,11 +10,13 @@
     "overall_best_seed73_iou_exceeds_primary": true,
     "markdown_draft_exists": true,
     "word_draft_exists": true,
-    "word_draft_contains_nine_images": true,
-    "at_least_nine_figures": true,
+    "word_draft_contains_ten_images": true,
+    "at_least_ten_figures": true,
     "reproducibility_manifest_passed": true,
     "four_recent_sources_verified": true,
     "three_complete_seeds_preserve_order": true,
+    "deduplicated_clean_subset_has_175_cases": true,
+    "deduplicated_three_seed_mean_preserves_order": true,
     "all_progressive_transitions_identity_initialized": true
   },
   "metrics": {
