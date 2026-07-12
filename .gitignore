@@ -4,3 +4,6 @@ __pycache__/
 data/busi.zip
 data/download_parts/
 runs/
+!runs/
+runs/*
+!runs/resnet50_ablation_U_seed3407_e20/

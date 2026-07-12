@@ -1,0 +1,11 @@
+{
+  "checkpoint": "D:\\codePlace\\AI_Code\\20260711-UNet-BUS-Opt\\runs\\resnet50_ablation_U_seed3407_e20\\best_model.pth",
+  "val_file": "busi_val3.txt",
+  "samples": 195,
+  "threshold": 0.5,
+  "per_image": {
+    "iou": 0.7787527903532371,
+    "dice": 0.8559360705889189
+  },
+  "saved_predictions": 0
+}

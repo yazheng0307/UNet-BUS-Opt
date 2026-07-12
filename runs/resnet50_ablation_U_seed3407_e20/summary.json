@@ -1,0 +1,24 @@
+{
+  "best_epoch": 4,
+  "best_val_per_image_iou": 0.7787527903532371,
+  "parameters": 31196029,
+  "loaded_segmentation_tensors": 490,
+  "elapsed_seconds": 211.14543414115906,
+  "args": {
+    "variant": "U",
+    "base_dir": "./data/busi",
+    "train_file": "busi_train3.txt",
+    "val_file": "busi_val3.txt",
+    "init_checkpoint": "./runs/resnet50_unet_split3/best_model.pth",
+    "output_dir": "./runs/resnet50_ablation_U_seed3407_e20",
+    "epochs": 20,
+    "batch_size": 4,
+    "img_size": 256,
+    "lr": 0.0001,
+    "backbone_lr": 2e-05,
+    "weight_decay": 0.0001,
+    "workers": 4,
+    "seed": 3407,
+    "no_amp": false
+  }
+}
