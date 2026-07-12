@@ -20,8 +20,8 @@ class MedicalDataSets(Dataset):
         self.semi_list = []
 
         if self.split == "train":
-            with open(os.path.join(self._base_dir, train_file_dir), "r") as f1:
-                self.sample_list = f1.readlines()
+            with open(os.path.join(self._base_dir, train_file_dir), "r") as train_list_file:
+                self.sample_list = train_list_file.readlines()
             self.sample_list = [item.replace("\n", "") for item in self.sample_list]
 
         elif self.split == "val":

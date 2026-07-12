@@ -94,7 +94,7 @@ python infer.py --model [MobileUViT/CMUNeXt/CMUNet/TransUnet/...] --model_path [
 
 We train the U-shape based networks with [BUSI dataset](https://www.kaggle.com/aryashah2k/breast-ultrasound-images-dataset). The BUSI collected 780 breast ultrasound images, including normal, benign and malignant cases of breast cancer with their corresponding segmentation results. **We only used benign and malignant images (647 images)**. And we randomly split thrice in [/data](https://github.com/FengheTan9/Medical-Image-Segmentation-Benchmarks/tree/main/data), 70% for training and 30% for validation. In addition, we resize all the images 256×256 and perform random rotation and flip for data augmentation.
 
-|     Method      |   Params (M)    |        FPS        |     GFLOPs      |          IoU          |       F1-value        |
+|     Method      |   Params (M)    |        FPS        |     GFLOPs      |          IoU          |          Dice         |
 | :-------------: | :-------------: | :---------------: | :-------------: | :-------------------: | :-------------------: |
 |      U-Net      |      34.52      |      139.32       |      65.52      |      68.61±2.86       |      76.97±3.10       |
 | Attention U-Net |      34.87      |      129.92       |      66.63      |      68.55±3.22       |      76.88±3.50       |

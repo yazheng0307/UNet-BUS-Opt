@@ -128,10 +128,7 @@ def main(args):
                       'iou': AverageMeter(),
                       'val_loss': AverageMeter(),
                       'val_iou': AverageMeter(),
-                      'val_SE': AverageMeter(),
-                      'val_PC': AverageMeter(),
-                      'val_F1': AverageMeter(),
-                      'val_ACC': AverageMeter()}
+                      'val_dice': AverageMeter()}
 
         for i_batch, sampled_batch in enumerate(trainloader):
 
@@ -161,19 +158,14 @@ def main(args):
                 img_batch, label_batch = img_batch.cuda(), label_batch.cuda()
                 output = model(img_batch)
                 loss = criterion(output, label_batch)
-                iou, _, SE, PC, F1, _, ACC = iou_score(output, label_batch)
+                iou, dice, _, _, _, _, _ = iou_score(output, label_batch)
                 avg_meters['val_loss'].update(loss.item(), img_batch.size(0))
                 avg_meters['val_iou'].update(iou, img_batch.size(0))
-                avg_meters['val_SE'].update(SE, img_batch.size(0))
-                avg_meters['val_PC'].update(PC, img_batch.size(0))
-                avg_meters['val_F1'].update(F1, img_batch.size(0))
-                avg_meters['val_ACC'].update(ACC, img_batch.size(0))
+                avg_meters['val_dice'].update(dice, img_batch.size(0))
 
-        print('epoch [%d/%d]  train_loss : %.4f, train_iou: %.4f - val_loss %.4f - val_iou %.4f - val_SE %.4f - '
-              'val_PC %.4f - val_F1 %.4f - val_ACC %.4f '
+        print('epoch [%d/%d]  train_loss : %.4f, train_iou: %.4f - val_loss %.4f - val_iou %.4f - val_dice %.4f '
             % (epoch_num, max_epoch, avg_meters['loss'].avg, avg_meters['iou'].avg,
-               avg_meters['val_loss'].avg, avg_meters['val_iou'].avg, avg_meters['val_SE'].avg,
-               avg_meters['val_PC'].avg, avg_meters['val_F1'].avg, avg_meters['val_ACC'].avg))
+               avg_meters['val_loss'].avg, avg_meters['val_iou'].avg, avg_meters['val_dice'].avg))
 
         if avg_meters['val_iou'].avg > best_iou:
             if not os.path.isdir("./checkpoint"):

@@ -62,8 +62,7 @@ def iou_score(output, target):
     PC = get_precision(output_, target_, threshold=0.5)
     SP = get_specificity(output_, target_, threshold=0.5)
     ACC = get_accuracy(output_, target_, threshold=0.5)
-    F1 = 2*SE*PC/(SE+PC + 1e-6)
-    return iou, dice, SE, PC, F1, SP, ACC
+    return iou, dice, SE, PC, dice, SP, ACC
 
 
 def dice_coef(output, target):

@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.py[cod]
+data/busi.zip
+data/download_parts/
+runs/
