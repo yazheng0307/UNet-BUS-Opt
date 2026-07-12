@@ -1,0 +1,12 @@
+{
+  "variant": "UB",
+  "checkpoint": "D:\\codePlace\\AI_Code\\20260711-UNet-BUS-Opt\\runs\\thesis_ch1\\UB_seed41_e60\\best_model.pth",
+  "val_file": "busi_val3.txt",
+  "samples": 195,
+  "threshold": 0.5,
+  "loaded_tensors": 477,
+  "missing_tensors": 0,
+  "unexpected_tensors": 0,
+  "iou": 0.7419274550217848,
+  "dice": 0.8253667183411427
+}

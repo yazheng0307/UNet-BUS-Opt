@@ -1,0 +1,12 @@
+{
+  "variant": "U",
+  "checkpoint": "D:\\codePlace\\AI_Code\\20260711-UNet-BUS-Opt\\runs\\busi_opt_ch1\\screen100_A0\\best_model.pth",
+  "val_file": "busi_val3.txt",
+  "samples": 195,
+  "threshold": 0.5,
+  "loaded_tensors": 188,
+  "missing_tensors": 250,
+  "unexpected_tensors": 0,
+  "iou": 0.7244497079115647,
+  "dice": 0.8071810043775118
+}

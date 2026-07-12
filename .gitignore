@@ -7,3 +7,8 @@ runs/
 !runs/
 runs/*
 !runs/resnet50_ablation_U_seed3407_e20/
+!runs/thesis_ch1/
+!runs/thesis_ch2/
+runs/thesis_ch1/**/best_model.pth
+runs/thesis_ch2/**/best_model.pth
+!runs/thesis_ch2/UABCD_seed41_e60/best_model.pth

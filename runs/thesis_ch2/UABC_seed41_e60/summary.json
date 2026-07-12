@@ -1,0 +1,30 @@
+{
+  "variant": "UABC",
+  "best_epoch": 37,
+  "best_val_iou": 0.7493209245877388,
+  "best_val_dice": 0.8302194155179538,
+  "loaded_tensors": 477,
+  "missing_tensors": 0,
+  "unexpected_tensors": 0,
+  "parameters": 11307232,
+  "elapsed_seconds": 843.9736092090607,
+  "args": {
+    "variant": "UABC",
+    "init_checkpoint": "./runs/thesis_ch1/UAB_seed41_e60/best_model.pth",
+    "new_module": "C",
+    "base_dir": "./data/busi",
+    "train_file": "busi_train3.txt",
+    "val_file": "busi_val3.txt",
+    "output_dir": "./runs/thesis_ch2/UABC_seed41_e60",
+    "epochs": 60,
+    "batch_size": 8,
+    "img_size": 256,
+    "base_channels": 32,
+    "base_lr": 2e-05,
+    "module_lr": 0.0001,
+    "weight_decay": 0.0001,
+    "workers": 4,
+    "seed": 41,
+    "no_amp": false
+  }
+}

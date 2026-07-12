@@ -1,5 +1,28 @@
 # Medical 2D Image Segmentation Benchmarks
 
+## BUSI Thesis Research Branch
+
+This repository now includes a unified progressive U-Net study for BUSI split 3:
+
+`U -> UA / UB -> UAB (UnetAB) -> UABC -> UABCD`
+
+| Model | IoU | Dice |
+|---|---:|---:|
+| U-Net | 72.445% | 80.718% |
+| U-Net + A | 73.622% | 81.817% |
+| U-Net + B | 74.193% | 82.537% |
+| U-Net + A + B (UnetAB) | 74.847% | 82.943% |
+| UnetAB + C | 74.932% | 83.022% |
+| UnetAB + C + D | **75.115%** | **83.480%** |
+
+- Unified model: `src/network/conv_based/ThesisFourStageUNet.py`
+- Progressive training: `train_thesis_stages.py`
+- Independent evaluation: `evaluate_thesis_stages.py`
+- Chinese dissertation draft: `博士学位论文初稿.md` and `博士学位论文初稿.docx`
+- Figures and statistical tables: `thesis_artifacts/`
+
+All results use BUSI split 3, a fixed threshold of 0.5, and mean per-case IoU for checkpoint selection.
+
 ![ushape](img/ushape.png)
 
 For easy evaluation and fair comparison on 2D medical image segmentation method, we aim to collect and build a medical image segmentation U-shape architecture benchmark to implement the medical 2d image segmentation tasks.

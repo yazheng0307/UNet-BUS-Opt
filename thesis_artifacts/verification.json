@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "checks": {
+    "chapter1_uab_best_iou": true,
+    "chapter1_uab_best_dice": true,
+    "chapter2_strict_iou_order": true,
+    "chapter2_strict_dice_order": true,
+    "final_checkpoint_exists": true,
+    "markdown_draft_exists": true,
+    "word_draft_exists": true,
+    "at_least_eight_figures": true
+  },
+  "metrics": {
+    "U": {
+      "iou": 0.7244497079115647,
+      "dice": 0.8071810043775118
+    },
+    "UA": {
+      "iou": 0.7362157888901539,
+      "dice": 0.8181726535161337
+    },
+    "UB": {
+      "iou": 0.7419274550217848,
+      "dice": 0.8253667183411427
+    },
+    "UAB": {
+      "iou": 0.7484731888159727,
+      "dice": 0.8294292798409095
+    },
+    "UABC": {
+      "iou": 0.7493209245877388,
+      "dice": 0.8302194155179538
+    },
+    "UABCD": {
+      "iou": 0.7511501257236187,
+      "dice": 0.8348036215855525
+    }
+  },
+  "scope_note": "This verifies the requested model ordering and draft artifacts on BUSI split 3. It does not prove multi-seed or external-dataset generalization."
+}
