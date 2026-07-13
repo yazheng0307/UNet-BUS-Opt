@@ -21,6 +21,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Build the Chinese dissertation Word draft from Markdown")
     parser.add_argument("--input", default="博士学位论文初稿.md")
     parser.add_argument("--output", default="博士学位论文初稿.docx")
+    parser.add_argument("--title", default="乳腺超声图像渐进分割方法研究")
     return parser.parse_args()
 
 
@@ -167,11 +168,11 @@ def add_image(document, caption, image_path):
         set_east_asia_font(caption_run, "宋体")
 
 
-def build_document(markdown_path, output_path):
+def build_document(markdown_path, output_path, title):
     lines = markdown_path.read_text(encoding="utf-8").splitlines()
     document = Document()
     configure_document(document)
-    document.core_properties.title = "乳腺超声图像渐进分割方法研究"
+    document.core_properties.title = title
     document.core_properties.subject = "U-Net, BUSI, 医学图像分割"
 
     index = 0
@@ -256,7 +257,7 @@ def main():
     args = parse_args()
     input_path = (ROOT / args.input).resolve()
     output_path = (ROOT / args.output).resolve()
-    build_document(input_path, output_path)
+    build_document(input_path, output_path, args.title)
     print("wrote {} ({} bytes)".format(output_path, output_path.stat().st_size))
 
 
