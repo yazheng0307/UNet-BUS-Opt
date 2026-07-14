@@ -293,6 +293,91 @@ POST_REPLACEMENTS = [
 MAPPING_INSERT = """本文中四个模块采用容易理解的功能名称。为了与程序代码对应，表 1-1 给出论文名称和代码实现的关系。\n\n| 模块 | 论文中的名称 | 主要作用 | 代码中的对应实现 |\n|---|---|---|---|\n| A | 多特征增强模块 | 分别处理噪声、小病灶和模糊边界特征 | `StableTriChallengeAdapter` |\n| B | 全局关系增强模块 | 补充不同特征通道之间的整体联系 | `ChannelGraphReasoning` |\n| C | 边界细化模块 | 使用边界和距离信息调整分割轮廓 | `BoundaryDistanceCooperativeHead` |\n| D | 不确定区域修正模块 | 分别修正容易出错区域中的漏分和误分 | `UncertaintyDrivenDualErrorRefinement` |\n\n"""
 
 
+MAINSTREAM_REVIEW = """### 1.3.2 主流对比模型介绍
+
+为了更清楚地说明本文方法与常见分割网络的区别，下面介绍项目中已经实现并报告 BUSI 结果的 11 个模型。它们可以分为传统卷积模型、Transformer 或混合模型，以及轻量化模型三类。
+
+1. **U-Net。** U-Net 采用编码器和解码器结构。编码器逐步提取较深层特征，解码器恢复图像尺寸，同尺度跳跃连接把浅层细节直接送到解码端。它结构简单、容易训练，是本文和多数医学图像分割工作的基础模型[1]。
+2. **Attention U-Net。** Attention U-Net 在跳跃连接处加入注意力门。解码器提供的较高层信息用于判断哪些编码特征更重要，从而减弱背景区域的影响。不过，注意力门会增加少量参数和计算量[2]。
+3. **U-Net++。** U-Net++ 把原来直接相连的跳跃连接改成多层嵌套连接，并在中间层逐步融合编码和解码特征。它还可以使用深监督帮助不同深度的输出学习，但连接较多，结构比 U-Net 更复杂[3]。
+4. **U-Net3+。** U-Net3+ 在每个解码阶段同时接收多个编码层和解码层的特征，使不同尺度的信息能够更充分地融合。这种全尺度连接有利于处理大小不同的目标，但计算量通常较大[4]。
+5. **TransUnet。** TransUnet 先使用卷积网络提取局部特征，再使用 Transformer 建立较远位置之间的联系，最后通过 U 形解码器恢复分割图。它兼顾局部和整体信息，但参数量较大，对训练数据和预训练权重也比较敏感[6]。
+6. **MedT。** MedT 使用门控轴向注意力，把二维注意力分成水平和垂直两个方向计算，以降低完整自注意力的开销。它还采用整图和局部图块结合的训练方法，同时学习整体位置和局部细节[31]。
+7. **SwinUnet。** SwinUnet 使用分层的 Swin Transformer 组成编码器和解码器，并通过移动窗口让相邻窗口之间交换信息。窗口注意力能够控制计算量，但模型在小型医学数据集上的效果容易受到预训练方式和训练设置影响[7]。
+8. **UNeXt。** UNeXt 前几层使用卷积，网络较深位置使用基于多层感知机的特征块。它通过通道移动和特征投影学习局部联系，重点是减少参数量和提高推理速度[32]。
+9. **CMU-Net。** CMU-Net 面向超声图像设计，使用 ConvMixer 模块扩大特征的有效范围，并在跳跃连接中加入多尺度注意力门。前者用于补充整体信息，后者用于筛选更有用的浅层特征[33]。
+10. **CMUNeXt。** CMUNeXt 是轻量卷积网络。它使用大卷积核和倒置瓶颈结构提取较大范围的信息，并通过 Skip-Fusion 模块改善编码器和解码器之间的特征融合[34]。
+11. **Mobile U-ViT。** Mobile U-ViT 面向移动设备设计，使用大卷积核卷积块完成分层特征提取，在最深层加入较浅的 Transformer，并采用级联解码器恢复分割结果。该模型在参数量较小的情况下兼顾局部和整体信息，是原项目参考结果中 IoU 和 Dice 最高的模型[35]。
+
+这 11 个模型代表了三条常见改进路线：Attention U-Net、U-Net++ 和 U-Net3+ 主要改进特征融合；TransUnet、MedT 和 SwinUnet 主要增加长距离信息；UNeXt、CMUNeXt 和 Mobile U-ViT 更重视轻量化。本文没有直接替换 U-Net 主干，而是在统一基线上按 A、B、C、D 的顺序解决局部特征、整体关系、边界和易错区域问题。
+
+"""
+
+
+REFERENCE_ROWS = """| U-Net | 34.52 | 139.32 | 65.52 GFLOPs | 68.61±2.86 | 76.97±3.10 |
+| Attention U-Net | 34.87 | 129.92 | 66.63 GFLOPs | 68.55±3.22 | 76.88±3.50 |
+| U-Net++ | 26.90 | 125.50 | 37.62 GFLOPs | 69.49±2.94 | 78.06±3.25 |
+| U-Net3+ | 26.97 | 50.60 | 199.74 GFLOPs | 68.38±3.35 | 76.88±3.68 |
+| TransUnet | 105.32 | 112.95 | 38.52 GFLOPs | 71.39±2.37 | 79.85±2.59 |
+| MedT | 1.37 | 22.97 | 2.40 GFLOPs | 63.36±1.56 | 73.37±1.63 |
+| SwinUnet | 27.14 | 392.21 | 5.91 GFLOPs | 54.11±2.29 | 65.46±1.91 |
+| UNeXt | 1.47 | 650.48 | 0.58 GFLOPs | 65.04±2.71 | 74.16±2.84 |
+| CMU-Net | 49.93 | 93.19 | 91.25 GFLOPs | 71.42±2.65 | 79.49±2.92 |
+| CMUNeXt | 3.14 | 471.43 | 7.41 GFLOPs | 71.56±2.43 | 79.86±2.58 |
+| Mobile U-ViT | 1.39 | 326.24 | 2.51 GFLOPs | **72.88±2.72** | **81.18±3.05** |"""
+
+
+CHAPTER3_COMPARISON = """## 3.5 与主流模型的参考对比
+
+原项目在 BUSI 的 647 个病灶病例上比较了 11 个主流模型。参考实验把数据随机划分三次，每次使用 70% 训练、30% 验证，并将图像统一缩放到 256×256。表中的均值和标准差来自这三次随机划分[36]。本文使用固定 split 3，并在同一划分上改变训练随机种子，因此两组结果的数据划分含义不同。为了减少单次结果的偶然性，本节使用 UnetAB 的三随机种子均值进行对照。
+
+| 模型 | 参数量/M | FPS | 计算量（原报告口径） | IoU/% | Dice/% |
+|---|---:|---:|---:|---:|---:|
+{rows}
+| **UnetAB（本文）** | **11.28** | 约112.2 | 19.42 GMACs | **74.617±0.218** | **82.826±0.103** |
+
+从准确率看，参考模型中 Mobile U-ViT 的结果最高，IoU 为 72.88%，Dice 为 81.18%。UnetAB 的三种子均值比它分别高 1.737 和 1.646 个百分点；随机种子 41 的主实验结果为 74.847% IoU 和 82.943% Dice，对应差值为 1.967 和 1.763 个百分点。由于两组实验不是相同划分，这些差值只能说明结果处于较有竞争力的范围，不能当作严格的显著性结论。
+
+从模型大小看，UnetAB 约有 11.28M 实际使用参数，比参考 U-Net 的 34.52M 少约 67.3%，比 TransUnet 的 105.32M 少约 89.3%。但这一优势部分来自本文采用的轻量 U-Net 基线，不能全部归因于 A 和 B。与 UNeXt、CMUNeXt 和 Mobile U-ViT 相比，UnetAB 的参数量仍明显更大，说明本文更偏向提高分割准确率，而不是追求极限轻量化。
+
+FPS 和计算量也不能直接横向排名。参考表使用 GFLOPs，本文复杂度脚本报告 GMACs；参考模型的测试硬件没有在当前文稿中统一，而本文速度来自 RTX 4060 Laptop GPU。它们可以帮助了解大致开销，但不能据此认定某个模型在同一设备上更快。较可靠的章内结论仍来自同一协议下的消融实验，即 UAB 同时优于 U、UA 和 UB。
+
+""".format(rows=REFERENCE_ROWS)
+
+
+CHAPTER4_COMPARISON = """## 4.5 与主流模型的参考对比
+
+第二章使用同一组主流模型参考结果，并将比较对象改为最终模型 UABCD。为与参考表中的“均值±标准差”形式接近，本文仍报告随机种子 7、41 和 73 在固定 split 3 上的均值与标准差。需要再次说明，参考模型的标准差来自三次随机数据划分，本文的标准差来自同一划分上的三次训练，两者不能解释为完全相同的实验。
+
+| 模型 | 参数量/M | FPS | 计算量（原报告口径） | IoU/% | Dice/% |
+|---|---:|---:|---:|---:|---:|
+{rows}
+| **UABCD（本文）** | **11.31** | 约99.7 | 21.40 GMACs | **75.128±0.307** | **83.306±0.223** |
+
+UABCD 的三种子 IoU 和 Dice 比参考结果最高的 Mobile U-ViT 分别高 2.248 和 2.126 个百分点，比 CMUNeXt 分别高 3.568 和 3.446 个百分点。随机种子 41 的主实验为 75.115% IoU 和 83.480% Dice，整体最佳的 seed 73 模型达到 75.442% IoU 和 83.382% Dice。这些结果说明最终模型在当前 BUSI 实验中具有较好的分割表现，但仍不能替代同一划分、同一训练轮数和同一硬件下的重新训练比较。
+
+与第一章的 UnetAB 相比，加入 C 和 D 后，三种子平均 IoU 从 74.617% 提高到 75.128%，Dice 从 82.826% 提高到 83.306%，对应提升为 0.511 和 0.480 个百分点。模型参数量只增加约 0.03M，但计算量从 19.42 GMACs 增加到 21.40 GMACs，单张延迟从 8.91 ms 增加到 10.03 ms。这说明 C 和 D 的参数开销较小，但全分辨率边界分支和多尺度辅助输出会增加一定计算时间。
+
+轻量模型仍有明显的部署优势。Mobile U-ViT 只有 1.39M 参数，UNeXt 和 CMUNeXt 的参考 FPS 也明显更高。UABCD 更适合作为重视分割质量的研究模型；如果后续需要在移动设备或超声仪器上运行，还需要使用通道裁剪、知识蒸馏或轻量主干进一步压缩。综合来看，本章的主要结论是 C 和 D 在较小参数增量下继续提高了 UnetAB，而不是宣称最终模型在所有速度和资源指标上都优于主流方法。
+
+""".format(rows=REFERENCE_ROWS)
+
+
+ADDITIONAL_REFERENCES = """[31] Valanarasu J M J, Oza P, Hacihaliloglu I, Patel V M. Medical Transformer: Gated Axial-Attention for Medical Image Segmentation. MICCAI, 2021. arXiv:2102.10662.
+
+[32] Valanarasu J M J, Patel V M. UNeXt: MLP-based Rapid Medical Image Segmentation Network. arXiv:2203.04967, 2022.
+
+[33] Tang F, Wang L, Ning C, Xian M, Ding J. CMU-Net: A Strong ConvMixer-based Medical Ultrasound Image Segmentation Network. IEEE ISBI, 2023. DOI: 10.1109/ISBI53787.2023.10230609.
+
+[34] Tang F, Ding J, Wang L, Ning C, Zhou S K. CMUNeXt: An Efficient Medical Image Segmentation Network based on Large Kernel and Skip Fusion. arXiv:2308.01239, 2023.
+
+[35] Tang F, Nian B, Ding J, et al. Mobile U-ViT: Revisiting Large Kernel and U-shaped ViT for Efficient Medical Image Segmentation. ACM Multimedia, 2025. arXiv:2508.01064.
+
+[36] Tang F. Medical-Image-Segmentation-Benchmarks: Results on BUSI [EB/OL]. GitHub, 2026-07-14. https://github.com/FengheTan9/Medical-Image-Segmentation-Benchmarks.
+
+"""
+
+
 def generate_architecture_figure():
     output = ROOT / "thesis_artifacts/figures/fig01_overall_architecture_plain.png"
     blocks = [
@@ -352,6 +437,53 @@ def main():
         if old not in text:
             raise RuntimeError("Expected post-replacement text was not found: {}".format(old[:40]))
         text = text.replace(old, new)
+
+    for old, new in (
+        ("### 1.3.5 既有工作与本文创新边界", "### 1.3.6 既有工作与本文创新边界"),
+        ("### 1.3.4 边界监督、距离场与不确定性", "### 1.3.5 边界监督、距离场与不确定性"),
+        ("### 1.3.3 特征关系计算与全局关系建模", "### 1.3.4 特征关系计算与全局关系建模"),
+    ):
+        if old not in text:
+            raise RuntimeError("Expected review heading was not found: {}".format(old))
+        text = text.replace(old, new, 1)
+    review_marker = "### 1.3.2 超声图像中的多分支特征处理\n"
+    if review_marker not in text:
+        raise RuntimeError("Mainstream review insertion point was not found")
+    text = text.replace(
+        review_marker,
+        MAINSTREAM_REVIEW + "### 1.3.3 超声图像中的多分支特征处理\n",
+        1,
+    )
+
+    text = text.replace("## 3.6 本章小结", "## 3.7 本章小结", 1)
+    chapter3_marker = "## 3.5 配对统计分析\n"
+    if chapter3_marker not in text:
+        raise RuntimeError("Chapter 3 comparison insertion point was not found")
+    text = text.replace(
+        chapter3_marker,
+        CHAPTER3_COMPARISON + "## 3.6 配对统计分析\n",
+        1,
+    )
+
+    text = text.replace("## 4.7 本章小结", "## 4.8 本章小结", 1)
+    text = text.replace("## 4.6 定性结果", "## 4.7 定性结果", 1)
+    chapter4_marker = "## 4.5 逐病例增益与统计解释\n"
+    if chapter4_marker not in text:
+        raise RuntimeError("Chapter 4 comparison insertion point was not found")
+    text = text.replace(
+        chapter4_marker,
+        CHAPTER4_COMPARISON + "## 4.6 逐病例增益与统计解释\n",
+        1,
+    )
+
+    appendix_marker = "# 附录 A 关键复现实验命令\n"
+    if appendix_marker not in text:
+        raise RuntimeError("Reference insertion point was not found")
+    text = text.replace(
+        appendix_marker,
+        ADDITIONAL_REFERENCES + appendix_marker,
+        1,
+    )
 
     marker = "本文技术路线如图 1-1 所示。\n\n"
     if marker not in text:

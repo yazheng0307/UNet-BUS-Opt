@@ -43,6 +43,19 @@ def main():
         "边界细化模块",
         "易错区域修正模块",
     )
+    mainstream_models = (
+        "U-Net",
+        "Attention U-Net",
+        "U-Net++",
+        "U-Net3+",
+        "TransUnet",
+        "MedT",
+        "SwinUnet",
+        "UNeXt",
+        "CMU-Net",
+        "CMUNeXt",
+        "Mobile U-ViT",
+    )
     checks = {
         "markdown_exists": MARKDOWN.is_file(),
         "word_exists": WORD.is_file(),
@@ -70,6 +83,36 @@ def main():
         "title_matches": document.core_properties.title == (
             "基于改进 U-Net 的乳腺超声图像分割方法研究"
         ),
+        "mainstream_review_contains_eleven_models": (
+            "### 1.3.2 主流对比模型介绍" in markdown
+            and all(model in markdown for model in mainstream_models)
+        ),
+        "both_research_chapters_have_comparisons": (
+            "## 3.5 与主流模型的参考对比" in markdown
+            and "## 4.5 与主流模型的参考对比" in markdown
+            and "UnetAB（本文）" in markdown
+            and "UABCD（本文）" in markdown
+        ),
+        "reference_metrics_match_source_table": all(
+            value in markdown
+            for value in (
+                "68.61±2.86",
+                "76.97±3.10",
+                "72.88±2.72",
+                "81.18±3.05",
+                "650.48",
+                "199.74 GFLOPs",
+            )
+        ),
+        "comparison_protocol_difference_disclosed": (
+            "参考模型的标准差来自三次随机数据划分" in markdown
+            and "本文的标准差来自同一划分上的三次训练" in markdown
+            and "不能解释为完全相同的实验" in markdown
+        ),
+        "new_references_present": all(
+            "[{}]".format(index) in markdown for index in range(31, 37)
+        ),
+        "at_least_ten_tables": len(document.tables) >= 10,
     }
     report = {
         "passed": all(checks.values()),
