@@ -1,0 +1,98 @@
+[
+  {
+    "comparison": "chapter1_UAB_seed41_vs_U",
+    "metric": "iou",
+    "cases": 195,
+    "mean_delta": 0.024023474800555316,
+    "ci95_low": 0.008956335525479081,
+    "ci95_high": 0.04057603836122629,
+    "wilcoxon_statistic": 11048.0,
+    "p_value_one_sided": 0.021118864507852796,
+    "improved_cases": 100,
+    "degraded_cases": 94
+  },
+  {
+    "comparison": "chapter1_UAB_seed41_vs_U",
+    "metric": "dice",
+    "cases": 195,
+    "mean_delta": 0.022248277356979113,
+    "ci95_low": 0.007362889197112049,
+    "ci95_high": 0.0384906924759385,
+    "wilcoxon_statistic": 11018.0,
+    "p_value_one_sided": 0.02313848212827956,
+    "improved_cases": 100,
+    "degraded_cases": 94
+  },
+  {
+    "comparison": "chapter1_UAB_seed41_vs_UB_seed41",
+    "metric": "iou",
+    "cases": 195,
+    "mean_delta": 0.00654572573332201,
+    "ci95_low": -0.0006673084075251453,
+    "ci95_high": 0.01510720883453622,
+    "wilcoxon_statistic": 10283.0,
+    "p_value_one_sided": 0.0931404815962022,
+    "improved_cases": 99,
+    "degraded_cases": 93
+  },
+  {
+    "comparison": "chapter1_UAB_seed41_vs_UB_seed41",
+    "metric": "dice",
+    "cases": 195,
+    "mean_delta": 0.004062569118160499,
+    "ci95_low": -0.002658997037105293,
+    "ci95_high": 0.01213152363684021,
+    "wilcoxon_statistic": 10271.0,
+    "p_value_one_sided": 0.09575977329320812,
+    "improved_cases": 99,
+    "degraded_cases": 93
+  },
+  {
+    "comparison": "chapter2_UABCD_seed73_vs_UAB_seed73",
+    "metric": "iou",
+    "cases": 195,
+    "mean_delta": 0.008521408495249207,
+    "ci95_low": -0.0005130674515527635,
+    "ci95_high": 0.017931189479612877,
+    "wilcoxon_statistic": 11547.0,
+    "p_value_one_sided": 0.003810387853822393,
+    "improved_cases": 112,
+    "degraded_cases": 82
+  },
+  {
+    "comparison": "chapter2_UABCD_seed73_vs_UAB_seed73",
+    "metric": "dice",
+    "cases": 195,
+    "mean_delta": 0.005926849261518031,
+    "ci95_low": -0.002923260311349903,
+    "ci95_high": 0.01471643937192878,
+    "wilcoxon_statistic": 11519.0,
+    "p_value_one_sided": 0.004235863693042042,
+    "improved_cases": 112,
+    "degraded_cases": 82
+  },
+  {
+    "comparison": "chapter2_UABCD_seed73_vs_U",
+    "metric": "iou",
+    "cases": 195,
+    "mean_delta": 0.029967185506380254,
+    "ci95_low": 0.0143947454118417,
+    "ci95_high": 0.047063516525949325,
+    "wilcoxon_statistic": 11537.0,
+    "p_value_one_sided": 0.0025464022820990595,
+    "improved_cases": 105,
+    "degraded_cases": 88
+  },
+  {
+    "comparison": "chapter2_UABCD_seed73_vs_U",
+    "metric": "dice",
+    "cases": 195,
+    "mean_delta": 0.026640466521969705,
+    "ci95_low": 0.012674326780003728,
+    "ci95_high": 0.04222612524730004,
+    "wilcoxon_statistic": 11463.0,
+    "p_value_one_sided": 0.0034063049073891644,
+    "improved_cases": 105,
+    "degraded_cases": 88
+  }
+]

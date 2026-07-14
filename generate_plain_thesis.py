@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Generate a plainer master's-thesis version without changing experiment facts."""
 
 from pathlib import Path
@@ -307,58 +308,124 @@ MAINSTREAM_REVIEW = """### 1.3.2 主流对比模型介绍
 8. **UNeXt。** UNeXt 前几层使用卷积，网络较深位置使用基于多层感知机的特征块。它通过通道移动和特征投影学习局部联系，重点是减少参数量和提高推理速度[32]。
 9. **CMU-Net。** CMU-Net 面向超声图像设计，使用 ConvMixer 模块扩大特征的有效范围，并在跳跃连接中加入多尺度注意力门。前者用于补充整体信息，后者用于筛选更有用的浅层特征[33]。
 10. **CMUNeXt。** CMUNeXt 是轻量卷积网络。它使用大卷积核和倒置瓶颈结构提取较大范围的信息，并通过 Skip-Fusion 模块改善编码器和解码器之间的特征融合[34]。
-11. **Mobile U-ViT。** Mobile U-ViT 面向移动设备设计，使用大卷积核卷积块完成分层特征提取，在最深层加入较浅的 Transformer，并采用级联解码器恢复分割结果。该模型在参数量较小的情况下兼顾局部和整体信息，是原项目参考结果中 IoU 和 Dice 最高的模型[35]。
+11. **Mobile U-ViT。** Mobile U-ViT 面向移动设备设计，使用大卷积核卷积块完成分层特征提取，在最深层加入较浅的 Transformer，并采用级联解码器恢复分割结果。该模型代表了卷积和轻量 Transformer 结合的移动端设计路线[35]。
 
 这 11 个模型代表了三条常见改进路线：Attention U-Net、U-Net++ 和 U-Net3+ 主要改进特征融合；TransUnet、MedT 和 SwinUnet 主要增加长距离信息；UNeXt、CMUNeXt 和 Mobile U-ViT 更重视轻量化。本文没有直接替换 U-Net 主干，而是在统一基线上按 A、B、C、D 的顺序解决局部特征、整体关系、边界和易错区域问题。
 
 """
 
 
-REFERENCE_ROWS = """| U-Net | 34.52 | 139.32 | 65.52 GFLOPs | 68.61±2.86 | 76.97±3.10 |
-| Attention U-Net | 34.87 | 129.92 | 66.63 GFLOPs | 68.55±3.22 | 76.88±3.50 |
-| U-Net++ | 26.90 | 125.50 | 37.62 GFLOPs | 69.49±2.94 | 78.06±3.25 |
-| U-Net3+ | 26.97 | 50.60 | 199.74 GFLOPs | 68.38±3.35 | 76.88±3.68 |
-| TransUnet | 105.32 | 112.95 | 38.52 GFLOPs | 71.39±2.37 | 79.85±2.59 |
-| MedT | 1.37 | 22.97 | 2.40 GFLOPs | 63.36±1.56 | 73.37±1.63 |
-| SwinUnet | 27.14 | 392.21 | 5.91 GFLOPs | 54.11±2.29 | 65.46±1.91 |
-| UNeXt | 1.47 | 650.48 | 0.58 GFLOPs | 65.04±2.71 | 74.16±2.84 |
-| CMU-Net | 49.93 | 93.19 | 91.25 GFLOPs | 71.42±2.65 | 79.49±2.92 |
-| CMUNeXt | 3.14 | 471.43 | 7.41 GFLOPs | 71.56±2.43 | 79.86±2.58 |
-| Mobile U-ViT | 1.39 | 326.24 | 2.51 GFLOPs | **72.88±2.72** | **81.18±3.05** |"""
+REFERENCE_ROWS = """| U-Net | 34.52 | 139.32 | 65.52 GFLOPs | 68.61 | 76.97 |
+| Attention U-Net | 34.87 | 129.92 | 66.63 GFLOPs | 68.55 | 76.88 |
+| U-Net++ | 26.90 | 125.50 | 37.62 GFLOPs | 69.49 | 78.06 |
+| U-Net3+ | 26.97 | 50.60 | 199.74 GFLOPs | 68.38 | 76.88 |
+| TransUnet | 105.32 | 112.95 | 38.52 GFLOPs | 71.39 | 79.85 |
+| MedT | 1.37 | 22.97 | 2.40 GFLOPs | 63.36 | 73.37 |
+| SwinUnet | 27.14 | 392.21 | 5.91 GFLOPs | 54.11 | 65.46 |
+| UNeXt | 1.47 | 650.48 | 0.58 GFLOPs | 65.04 | 74.16 |
+| CMU-Net | 49.93 | 93.19 | 91.25 GFLOPs | 71.42 | 79.49 |
+| CMUNeXt | 3.14 | 471.43 | 7.41 GFLOPs | **71.56** | **79.86** |"""
 
 
 CHAPTER3_COMPARISON = """## 3.5 与主流模型的参考对比
 
-原项目在 BUSI 的 647 个病灶病例上比较了 11 个主流模型。参考实验把数据随机划分三次，每次使用 70% 训练、30% 验证，并将图像统一缩放到 256×256。表中的均值和标准差来自这三次随机划分[36]。本文使用固定 split 3，并在同一划分上改变训练随机种子，因此两组结果的数据划分含义不同。为了减少单次结果的偶然性，本节使用 UnetAB 的三随机种子均值进行对照。
+原项目在 BUSI 的 647 个病灶病例上报告了主流模型结果。经原仓库作者确认，原表“±”前的数值对应固定 split 3 的训练结果，因此本节采用这些数值[36]。本文模型在 seed 7、41 和 73 中按照 IoU 选择最优运行，并报告同一次运行对应的 Dice。UnetAB 的最优运行是 seed 41，IoU 为 74.847%，Dice 为 82.943%。
 
 | 模型 | 参数量/M | FPS | 计算量（原报告口径） | IoU/% | Dice/% |
 |---|---:|---:|---:|---:|---:|
 {rows}
-| **UnetAB（本文）** | **11.28** | 约112.2 | 19.42 GMACs | **74.617±0.218** | **82.826±0.103** |
+| **UnetAB（本文，seed 41）** | **11.28** | 约112.2 | 19.42 GMACs | **74.847** | **82.943** |
 
-从准确率看，参考模型中 Mobile U-ViT 的结果最高，IoU 为 72.88%，Dice 为 81.18%。UnetAB 的三种子均值比它分别高 1.737 和 1.646 个百分点；随机种子 41 的主实验结果为 74.847% IoU 和 82.943% Dice，对应差值为 1.967 和 1.763 个百分点。由于两组实验不是相同划分，这些差值只能说明结果处于较有竞争力的范围，不能当作严格的显著性结论。
+### 3.5.1 差值描述性分析
 
-从模型大小看，UnetAB 约有 11.28M 实际使用参数，比参考 U-Net 的 34.52M 少约 67.3%，比 TransUnet 的 105.32M 少约 89.3%。但这一优势部分来自本文采用的轻量 U-Net 基线，不能全部归因于 A 和 B。与 UNeXt、CMUNeXt 和 Mobile U-ViT 相比，UnetAB 的参数量仍明显更大，说明本文更偏向提高分割准确率，而不是追求极限轻量化。
+本节所列参考模型中，CMUNeXt 的 IoU 和 Dice 最高，分别为 71.56% 和 79.86%。UnetAB 比 CMUNeXt 高 3.287 个 IoU 百分点和 3.083 个 Dice 百分点；比参考 U-Net 高 6.237 个 IoU 百分点和 5.973 个 Dice 百分点。以上差值是在固定 split 3 汇总指标上的直接相减，用于说明性能差距，不等同于统计显著性。
 
-FPS 和计算量也不能直接横向排名。参考表使用 GFLOPs，本文复杂度脚本报告 GMACs；参考模型的测试硬件没有在当前文稿中统一，而本文速度来自 RTX 4060 Laptop GPU。它们可以帮助了解大致开销，但不能据此认定某个模型在同一设备上更快。较可靠的章内结论仍来自同一协议下的消融实验，即 UAB 同时优于 U、UA 和 UB。
+| 参照模型 | UnetAB的IoU差值/百分点 | UnetAB的Dice差值/百分点 |
+|---|---:|---:|
+| U-Net | +6.237 | +5.973 |
+| Attention U-Net | +6.297 | +6.063 |
+| U-Net++ | +5.357 | +4.883 |
+| U-Net3+ | +6.467 | +6.063 |
+| TransUnet | +3.457 | +3.093 |
+| MedT | +11.487 | +9.573 |
+| SwinUnet | +20.737 | +17.483 |
+| UNeXt | +9.807 | +8.783 |
+| CMU-Net | +3.427 | +3.453 |
+| CMUNeXt | +3.287 | +3.083 |
+
+UnetAB 约有 11.28M 实际使用参数，比参考 U-Net 的 34.52M 少约 67.3%，比 TransUnet 的 105.32M 少约 89.3%，但约为 CMUNeXt 参数量的 3.59 倍。这说明 UnetAB 在分割精度和模型大小之间取得了折中，但并不是参数最少的模型。参考表使用 GFLOPs，本文复杂度脚本使用 GMACs；参考模型和本文模型的速度测试硬件也没有完全统一，因此 FPS 和计算量只作描述，不进行显著性判断。
+
+### 3.5.2 本文模型的内部配对检验
+
+主流模型目前只有汇总指标，没有保存与本文完全对应的 195 例逐病例预测，因此不能严谨计算 UnetAB 相对 CMUNeXt 等模型的配对 p 值。统计检验只在本文保存了逐病例结果的模型之间进行。本文采用单侧 Wilcoxon 配对符号秩检验，并用 20,000 次 Bootstrap 给出平均差的 95% 置信区间。
+
+| 配对比较 | 指标 | 平均提升/百分点 | Bootstrap 95%区间 | 单侧 p 值 | 结论 |
+|---|---|---:|---:|---:|---|
+| UAB seed 41 对 U | IoU | +2.402 | [0.896, 4.058] | 0.0211 | 显著 |
+| UAB seed 41 对 U | Dice | +2.225 | [0.736, 3.849] | 0.0231 | 显著 |
+| UAB seed 41 对 UB seed 41 | IoU | +0.655 | [-0.067, 1.511] | 0.0931 | 不显著 |
+| UAB seed 41 对 UB seed 41 | Dice | +0.406 | [-0.266, 1.213] | 0.0958 | 不显著 |
+
+结果表明，UnetAB 相对基础 U-Net 的两项指标均达到 `p<0.05`，且平均差置信区间不跨 0，可以认为 A+B 组合相对基线具有统计显著优势。但 UAB 相对较强的 UB 仅有小幅提升，尚未达到 `p<0.05`。因此，本章能够支持“组合模型明显优于基础 U-Net”，但不能把 A 在 B 之后的增量写成已经稳定显著。
+
+### 3.5.3 为什么 A 和 B 能够带来提升
+
+1. **A 与乳腺超声中的具体困难对应。** 噪声处理分支先做局部平均，小病灶分支保留紧凑细节，边界分支使用较大范围的卷积。根据图像内容计算三个分支的权重，可以减少一种固定卷积同时处理所有困难时的冲突。
+2. **B 补充了 U-Net 较弱的整体判断能力。** B 在网络最深层计算通道关系，把分散在不同位置和通道中的病灶信息联系起来。这有助于保留真正的病灶响应，并压低远离病灶的错误前景。UB 相对 U 的 IoU 和 Dice 置信区间均不跨 0，也与这一作用相符。
+3. **A 和 B 处理的问题不同。** A 先改善局部特征，B 再从整体上检查这些特征是否一致。两者按顺序连接后，UAB 同时高于 UA 和 UB，说明局部增强和整体关系并不是简单重复。
+4. **不改变原输出的初始化提高了训练稳定性。** A、B 刚加入时不会破坏已有分割结果，后续训练只需学习有用的修正量，因此比从随机输出直接联合训练更稳定。
 
 """.format(rows=REFERENCE_ROWS)
 
 
 CHAPTER4_COMPARISON = """## 4.5 与主流模型的参考对比
 
-第二章使用同一组主流模型参考结果，并将比较对象改为最终模型 UABCD。为与参考表中的“均值±标准差”形式接近，本文仍报告随机种子 7、41 和 73 在固定 split 3 上的均值与标准差。需要再次说明，参考模型的标准差来自三次随机数据划分，本文的标准差来自同一划分上的三次训练，两者不能解释为完全相同的实验。
+第二章继续使用固定 split 3 的主流模型结果。UABCD 在三个随机种子中按 IoU 选择最优运行，seed 73 的 IoU 最高，为 75.442%，该次运行对应的 Dice 为 83.382%。虽然 seed 41 的 Dice 为 83.480%，但本文不把不同种子的最大 IoU 和最大 Dice 拼接为一条结果。
 
 | 模型 | 参数量/M | FPS | 计算量（原报告口径） | IoU/% | Dice/% |
 |---|---:|---:|---:|---:|---:|
 {rows}
-| **UABCD（本文）** | **11.31** | 约99.7 | 21.40 GMACs | **75.128±0.307** | **83.306±0.223** |
+| **UABCD（本文，seed 73）** | **11.31** | 约99.7 | 21.40 GMACs | **75.442** | **83.382** |
 
-UABCD 的三种子 IoU 和 Dice 比参考结果最高的 Mobile U-ViT 分别高 2.248 和 2.126 个百分点，比 CMUNeXt 分别高 3.568 和 3.446 个百分点。随机种子 41 的主实验为 75.115% IoU 和 83.480% Dice，整体最佳的 seed 73 模型达到 75.442% IoU 和 83.382% Dice。这些结果说明最终模型在当前 BUSI 实验中具有较好的分割表现，但仍不能替代同一划分、同一训练轮数和同一硬件下的重新训练比较。
+### 4.5.1 差值描述性分析
 
-与第一章的 UnetAB 相比，加入 C 和 D 后，三种子平均 IoU 从 74.617% 提高到 75.128%，Dice 从 82.826% 提高到 83.306%，对应提升为 0.511 和 0.480 个百分点。模型参数量只增加约 0.03M，但计算量从 19.42 GMACs 增加到 21.40 GMACs，单张延迟从 8.91 ms 增加到 10.03 ms。这说明 C 和 D 的参数开销较小，但全分辨率边界分支和多尺度辅助输出会增加一定计算时间。
+UABCD 比本节参考结果最好的 CMUNeXt 高 3.882 个 IoU 百分点和 3.522 个 Dice 百分点，比参考 U-Net 高 6.832 个 IoU 百分点和 6.412 个 Dice 百分点。UABCD 约有 11.31M 参数，比 CMUNeXt 大约 3.60 倍，但仍明显小于参考 U-Net、U-Net++、U-Net3+、TransUnet、SwinUnet 和 CMU-Net。
 
-轻量模型仍有明显的部署优势。Mobile U-ViT 只有 1.39M 参数，UNeXt 和 CMUNeXt 的参考 FPS 也明显更高。UABCD 更适合作为重视分割质量的研究模型；如果后续需要在移动设备或超声仪器上运行，还需要使用通道裁剪、知识蒸馏或轻量主干进一步压缩。综合来看，本章的主要结论是 C 和 D 在较小参数增量下继续提高了 UnetAB，而不是宣称最终模型在所有速度和资源指标上都优于主流方法。
+| 参照模型 | UABCD的IoU差值/百分点 | UABCD的Dice差值/百分点 |
+|---|---:|---:|
+| U-Net | +6.832 | +6.412 |
+| Attention U-Net | +6.892 | +6.502 |
+| U-Net++ | +5.952 | +5.322 |
+| U-Net3+ | +7.062 | +6.502 |
+| TransUnet | +4.052 | +3.532 |
+| MedT | +12.082 | +10.012 |
+| SwinUnet | +21.332 | +17.922 |
+| UNeXt | +10.402 | +9.222 |
+| CMU-Net | +4.022 | +3.892 |
+| CMUNeXt | +3.882 | +3.522 |
+
+在 seed 73 的同一条渐进训练链中，UnetAB 的 IoU/Dice 为 74.590%/82.789%，加入 C 和 D 后提高到 75.442%/83.382%，即提高 0.852 和 0.593 个百分点。模型参数量只比 UnetAB 增加约 0.03M，但计算量从 19.42 GMACs 增加到 21.40 GMACs，单张延迟从 8.91 ms 增加到 10.03 ms。C 和 D 的参数开销较小，但全分辨率边界分支和多尺度辅助输出会增加一定计算时间。
+
+### 4.5.2 本文模型的内部配对检验
+
+表中主流模型没有逐病例预测文件，因此下列统计检验仍限定在本文模型内部。UABCD 与 UnetAB 的比较使用同为 seed 73 的 195 个病例，避免把不同种子结果强行配对；与 U-Net 的比较使用公共基线逐病例结果。
+
+| 配对比较 | 指标 | 平均提升/百分点 | Bootstrap 95%区间 | 单侧 p 值 | 结论 |
+|---|---|---:|---:|---:|---|
+| UABCD seed 73 对 UAB seed 73 | IoU | +0.852 | [-0.051, 1.793] | 0.0038 | 秩检验显著，均值区间跨0 |
+| UABCD seed 73 对 UAB seed 73 | Dice | +0.593 | [-0.292, 1.472] | 0.0042 | 秩检验显著，均值区间跨0 |
+| UABCD seed 73 对 U | IoU | +2.997 | [1.439, 4.706] | 0.0025 | 显著 |
+| UABCD seed 73 对 U | Dice | +2.664 | [1.267, 4.223] | 0.0034 | 显著 |
+
+UABCD 相对 U-Net 的两项检验均达到 `p<0.01`，且平均差置信区间不跨 0，可以认为最终模型相对基础 U-Net 具有统计显著优势。UABCD 相对同 seed 的 UnetAB 有 112 例改善、82 例下降，Wilcoxon 检验也达到 `p<0.01`；但平均提升的 Bootstrap 区间仍跨 0，说明少数病例的较大波动会影响平均值。较准确的结论是“多数病例的排序变化支持提升，但平均增益仍需更多随机种子验证”。另外，由于 seed 73 是从三个种子中按 IoU 选出的最优运行，这些 p 值属于选择后的探索性结果，不能替代预先指定种子的独立验证。
+
+### 4.5.3 为什么 C 和 D 能够继续提升结果
+
+1. **C 为边界调整提供了方向信息。** 普通 Dice 和 BCE 主要判断像素属于前景还是背景，不能直接告诉模型边界应向内还是向外移动。C 同时学习边界和有符号距离，使靠近轮廓的像素获得更明确的调整方向，因此能够修正少量边界偏移。
+2. **D 把漏分和误分分开处理。** 漏分需要增加病灶概率，误分需要降低病灶概率。D 使用两个独立分支完成相反操作，避免一个修正分支同时学习两种方向时相互干扰。
+3. **不确定性让 D 重点修改易错区域。** 预测熵可以找到概率接近 0.5 的像素，不同尺度输出的差异可以找到各层判断不一致的位置。两者结合后，D 不需要大范围改动已经分对的区域，而是把计算集中在模糊边界和疑似漏分区域。
+4. **C 和 D 建立在较好的 UnetAB 上。** A 和 B 已经完成主要病灶定位，C、D 只需学习较小的边界和错误修正量。早期实验中 C、D 从随机状态直接训练没有超过控制组，也说明它们依赖可靠的前级结果。
+5. **增益仍然有限且存在病例差异。** C、D 主要改变少量像素，所以平均提升小于 A、B；Bootstrap 区间跨 0 也表明它们还没有在所有病例上稳定获益。这与模块作用范围较窄的设计相符，并提示后续需要针对完全漏检病例继续改进。
 
 """.format(rows=REFERENCE_ROWS)
 
@@ -374,6 +441,47 @@ ADDITIONAL_REFERENCES = """[31] Valanarasu J M J, Oza P, Hacihaliloglu I, Patel 
 [35] Tang F, Nian B, Ding J, et al. Mobile U-ViT: Revisiting Large Kernel and U-shaped ViT for Efficient Medical Image Segmentation. ACM Multimedia, 2025. arXiv:2508.01064.
 
 [36] Tang F. Medical-Image-Segmentation-Benchmarks: Results on BUSI [EB/OL]. GitHub, 2026-07-14. https://github.com/FengheTan9/Medical-Image-Segmentation-Benchmarks.
+
+"""
+
+
+BEST_SEED_REPLACEMENTS = [
+    (
+        "实验结果表明，第一部分中 U-Net、UA、UB 和 UAB 的 IoU 分别为 72.445%、73.622%、74.193% 和 74.847%，Dice 分别为 80.718%、81.817%、82.537% 和 82.943%。UAB 在两项指标上均为第一部分最优，并被命名为 UnetAB。第二部分以同一个 UnetAB 检查点为起点，UABC 和 UABCD 的 IoU 分别为 74.932% 和 75.115%，Dice 分别为 83.022% 和 83.480%，形成 UnetAB < UnetAB+C < UnetAB+C+D 的递进关系。最终模型包含约 11.31M 实际使用参数，在 RTX 4060 Laptop GPU 上处理单张 256×256 图像的平均前向延迟约为 10.03 ms。",
+        "实验结果采用三个随机种子中 IoU 最高的一次，并报告同一次运行的 Dice。第一部分中 U-Net、UA、UB 和 UAB 的 IoU 分别为 72.445%、74.185%、74.193% 和 74.847%，Dice 分别为 80.718%、82.256%、82.537% 和 82.943%。UAB 在两项指标上均为第一部分最优，并被命名为 UnetAB。第二部分中 UAB、UABC 和 UABCD 的 IoU 分别为 74.847%、74.966% 和 75.442%，Dice 分别为 82.943%、83.089% 和 83.382%，仍形成 UnetAB < UnetAB+C < UnetAB+C+D 的递进关系。最终模型包含约 11.31M 实际使用参数，在 RTX 4060 Laptop GPU 上处理单张 256×256 图像的平均前向延迟约为 10.03 ms。",
+    ),
+    (
+        "In Chapter 1, U, UA, UB, and UAB achieve IoU scores of 72.445%, 73.622%, 74.193%, and 74.847%, and Dice scores of 80.718%, 81.817%, 82.537%, and 82.943%, respectively. UAB is therefore denoted as UnetAB. In Chapter 2, UABC and UABCD further improve IoU to 74.932% and 75.115%, and Dice to 83.022% and 83.480%. Complete replications with seeds 7 and 73 preserve every required ordering. Across seeds 7, 41, and 73, UABCD obtains 75.128% +/- 0.307% IoU and 83.306% +/- 0.223% Dice. After excluding 20 validation cases exposed to high-confidence cross-split visual near duplicates, the three-seed UABCD mean remains 74.464% IoU and 82.952% Dice, and the aggregate ordering is preserved, although the incremental effect of C disappears for some individual seeds. The final model contains 11.31M active parameters and requires approximately 10.03 ms per 256×256 image on an RTX 4060 Laptop GPU. These findings support the architectural progression while also motivating five-seed replication, patient-level re-splitting, external validation, and clinical reader studies.",
+        "For the main tables, each model uses the run with the highest IoU among seeds 7, 41, and 73, together with the Dice from that same run. In Chapter 1, U, UA, UB, and UAB obtain 72.445%, 74.185%, 74.193%, and 74.847% IoU, and 80.718%, 82.256%, 82.537%, and 82.943% Dice. UAB is denoted as UnetAB. In Chapter 2, UABC and UABCD reach 74.966% and 75.442% IoU, and 83.089% and 83.382% Dice. Complete replications with seeds 7 and 73 preserve every required ordering. Across all three seeds, UABCD obtains 75.128% +/- 0.307% IoU and 83.306% +/- 0.223% Dice. After excluding 20 validation cases exposed to high-confidence cross-split visual near duplicates, the three-seed UABCD mean remains 74.464% IoU and 82.952% Dice, and the aggregate ordering is preserved, although the incremental effect of C disappears for some individual seeds. The final model contains 11.31M active parameters and requires approximately 10.03 ms per 256×256 image on an RTX 4060 Laptop GPU. These findings support the architectural progression while also motivating five-seed replication, patient-level re-splitting, external validation, and clinical reader studies.",
+    ),
+    (
+        "| UA | ✓ |  | 73.622 | 81.817 | +1.177 |",
+        "| UA | ✓ |  | 74.185 | 82.256 | +1.740 |",
+    ),
+    (
+        "图 3-1 和表 3-1 表明，UA 和 UB 都优于基础 U-Net，UAB 的两项指标最高。A 说明针对噪声、小病灶和边界采用不同处理分支是有帮助的；B 的提升更大，说明整体特征关系对该数据集较重要。在 UB 上继续加入 A 后，IoU 提高 0.655 个百分点，Dice 提高 0.406 个百分点，说明 A 和 B 处理的问题不同，可以配合使用。",
+        "图 3-1 和表 3-1 使用各模型三个随机种子中 IoU 最高的一次。UA 和 UB 都优于基础 U-Net，UAB 的两项指标最高。A 和 B 相对 U-Net 的最佳 IoU 分别提高 1.740 和 1.748 个百分点。UAB 与 UB 的最优运行都来自 seed 41，在 UB 上继续加入 A 后，IoU 提高 0.655 个百分点，Dice 提高 0.406 个百分点，说明 A 和 B 处理的问题不同，可以配合使用。",
+    ),
+    (
+        "| UnetAB+C | ✓ |  | 74.932 | 83.022 | +0.085 |",
+        "| UnetAB+C | ✓ |  | 74.966 | 83.089 | +0.119 |",
+    ),
+    (
+        "| UnetAB+C+D | ✓ | ✓ | **75.115** | **83.480** | **+0.183** |",
+        "| UnetAB+C+D | ✓ | ✓ | **75.442** | **83.382** | **+0.476** |",
+    ),
+    (
+        "结果满足 $UnetAB<UnetAB+C<UnetAB+C+D$，最终模型在 IoU 和 Dice 上均为第二章最优。C 带来的平均增益较小，表明 UnetAB 已完成主要区域定位，C 主要对边界像素进行微调。D 的 Dice 增益大于 IoU 增益，说明其对预测区域整体重合程度具有更明显影响。",
+        "按照三个随机种子中最高 IoU 选择结果后，仍满足 $UnetAB<UnetAB+C<UnetAB+C+D$，最终模型在 IoU 和 Dice 上均为第二章最优。UABC 相对 UnetAB 的 IoU 和 Dice 分别提高 0.119 和 0.146 个百分点；UABCD 相对 UABC 分别提高 0.476 和 0.293 个百分点。C 主要调整少量边界像素，D 继续修正漏分和误分，因此两步提升都小于第一章的 A、B。",
+    ),
+    (
+        "统一 split 3 实验表明，第一章 U、UA、UB、UAB 的 IoU 为 72.445%、73.622%、74.193%、74.847%，Dice 为 80.718%、81.817%、82.537%、82.943%；第二章 UAB、UABC、UABCD 的 IoU 为 74.847%、74.932%、75.115%，Dice 为 82.943%、83.022%、83.480%。因此，当前实验已经满足两章预设的严格排序关系。",
+        "统一 split 3 实验中，按三个随机种子最高 IoU 选择后，第一章 U、UA、UB、UAB 的 IoU 为 72.445%、74.185%、74.193%、74.847%，Dice 为 80.718%、82.256%、82.537%、82.943%；第二章 UAB、UABC、UABCD 的 IoU 为 74.847%、74.966%、75.442%，Dice 为 82.943%、83.089%、83.382%。因此，两章仍满足预设的严格排序关系。",
+    ),
+]
+
+
+BEST_SEED_PROTOCOL = """本文一共完成随机种子 7、41 和 73 的训练。主结果表按照逐病例平均 IoU 从三个种子中选择最高的一次，并同时报告该次运行对应的 Dice，不分别挑选两项指标的最大值。按此规则，UA、UB、UAB、UABC 和 UABCD 的最优种子依次为 73、41、41、73 和 73。多种子均值与标准差仍在第 5 章单独报告。为了避免错误配对，逐病例统计检验只比较同一随机种子或公共 U-Net 基线的预测。
 
 """
 
@@ -482,6 +590,39 @@ def main():
     text = text.replace(
         appendix_marker,
         ADDITIONAL_REFERENCES + appendix_marker,
+        1,
+    )
+
+    for old, new in BEST_SEED_REPLACEMENTS:
+        if old not in text:
+            raise RuntimeError("Expected best-seed text was not found: {}".format(old[:40]))
+        text = text.replace(old, new, 1)
+    protocol_marker = "该训练顺序体现“先定位病灶，再调整边界，最后修正错误”的思路。"
+    if protocol_marker not in text:
+        raise RuntimeError("Best-seed protocol insertion point was not found")
+    text = text.replace(
+        protocol_marker,
+        BEST_SEED_PROTOCOL + protocol_marker,
+        1,
+    )
+    text = text.replace(
+        "thesis_artifacts/figures/fig02_chapter1_ablation.png",
+        "thesis_artifacts/figures/fig02_chapter1_ablation_best.png",
+        1,
+    )
+    text = text.replace(
+        "thesis_artifacts/figures/fig04_chapter2_ablation.png",
+        "thesis_artifacts/figures/fig04_chapter2_ablation_best.png",
+        1,
+    )
+    text = text.replace(
+        "## 3.6 配对统计分析\n\n",
+        "## 3.6 配对统计分析\n\n本节为保证逐病例一一对应，继续使用 seed 41 同一训练链中的预测，不与各模型跨种子挑选后的最大值进行配对。\n\n",
+        1,
+    )
+    text = text.replace(
+        "## 4.6 逐病例增益与统计解释\n\n",
+        "## 4.6 逐病例增益与统计解释\n\n本节原有逐病例分析使用 seed 41 的同一训练链，用来说明 C、D 在该固定运行中的病例差异；4.5.2 节则补充最优 seed 73 最终模型与同 seed UnetAB 的配对结果。\n\n",
         1,
     )
 
