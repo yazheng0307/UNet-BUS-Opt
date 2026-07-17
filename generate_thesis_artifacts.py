@@ -3,19 +3,16 @@ import os
 
 os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 
-import cv2
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import torch
 from matplotlib.patches import FancyBboxPatch
-from scipy.stats import wilcoxon
 
-from src.dataloader.dataset import MedicalDataSets
-from src.network.conv_based.ThesisFourStageUNet import ThesisFourStageUNet
-from train_unet import ValTransform
+# NOTE: cv2, torch, scipy and the project modules are imported lazily inside the
+# functions that need them, so the label-only figures can be regenerated in a
+# lightweight environment without the full training/inference stack.
 
 
 OUTPUT_DIR = "./thesis_artifacts"
@@ -50,6 +47,17 @@ COLORS = {
     "U": "#777777", "UA": "#4C78A8", "UB": "#59A14F",
     "UAB": "#E15759", "UABC": "#F28E2B", "UABCD": "#B07AA1",
 }
+
+# Paper-facing display labels for the code variants used as dict keys above.
+# The figures render with a Latin font, so the concise ASCII paper names are used.
+DISPLAY = {
+    "U": "U-Net", "UA": "U+A", "UB": "U+B",
+    "UAB": "LGR-UNet", "UABC": "LGR-UNet+C", "UABCD": "BUR-UNet",
+}
+
+
+def display_labels(names):
+    return [DISPLAY.get(name, name) for name in names]
 
 
 def setup():
@@ -92,7 +100,7 @@ def grouped_bars(table, names, title, output_name):
     fig, ax = plt.subplots(figsize=(8.2, 4.8))
     bars1 = ax.bar(x - width / 2, values_iou, width, label="IoU", color="#4C78A8")
     bars2 = ax.bar(x + width / 2, values_dice, width, label="Dice", color="#F28E2B")
-    ax.set_xticks(x, names)
+    ax.set_xticks(x, display_labels(names))
     ax.set_ylabel("Score (%)")
     ax.set_title(title)
     ax.set_ylim(min(values_iou) - 2.0, max(values_dice) + 2.0)
@@ -111,9 +119,9 @@ def training_curves(names, title, output_name):
     fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.2), sharex=True)
     for name in names:
         frame = pd.read_csv(HISTORIES[name])
-        axes[0].plot(frame["epoch"], 100 * frame["val_iou"], label=name,
+        axes[0].plot(frame["epoch"], 100 * frame["val_iou"], label=DISPLAY.get(name, name),
                      color=COLORS[name], linewidth=1.7)
-        axes[1].plot(frame["epoch"], 100 * frame["val_dice"], label=name,
+        axes[1].plot(frame["epoch"], 100 * frame["val_dice"], label=DISPLAY.get(name, name),
                      color=COLORS[name], linewidth=1.7)
     axes[0].set_title("Validation IoU")
     axes[1].set_title("Validation Dice")
@@ -133,7 +141,7 @@ def case_distribution(metrics):
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.8))
     for axis, metric in zip(axes, ("iou", "dice")):
         data = [100 * metrics[name][metric].to_numpy() for name in names]
-        box = axis.boxplot(data, labels=names, patch_artist=True, showfliers=False,
+        box = axis.boxplot(data, labels=display_labels(names), patch_artist=True, showfliers=False,
                            medianprops={"color": "black", "linewidth": 1.4})
         for patch, name in zip(box["boxes"], names):
             patch.set_facecolor(COLORS[name])
@@ -147,6 +155,8 @@ def case_distribution(metrics):
 
 
 def paired_statistics(metrics):
+    from scipy.stats import wilcoxon
+
     comparisons = [("U", "UA"), ("U", "UB"), ("UB", "UAB"),
                    ("UAB", "UABC"), ("UABC", "UABCD")]
     rng = np.random.default_rng(41)
@@ -179,7 +189,7 @@ def paired_statistics(metrics):
 def delta_plot(metrics):
     pairs = [("U", "UA"), ("U", "UB"), ("UB", "UAB"),
              ("UAB", "UABC"), ("UABC", "UABCD")]
-    labels = ["A vs U", "B vs U", "A on UB", "C on UAB", "D on UABC"]
+    labels = ["A vs U-Net", "B vs U-Net", "A on U+B", "C on LGR-UNet", "D on LGR-UNet+C"]
     data = [100 * (metrics[after]["iou"] - metrics[before]["iou"]).to_numpy()
             for before, after in pairs]
     fig, ax = plt.subplots(figsize=(9, 4.8))
@@ -217,7 +227,7 @@ def multiseed_plot():
             x, means, yerr=standard_deviations, fmt="o-", color=color,
             linewidth=1.8, markersize=6, capsize=4,
         )
-        axis.set_xticks(x, names)
+        axis.set_xticks(x, display_labels(names))
         axis.set_ylabel("{} (%)".format(metric.upper()))
         axis.set_title("{}-seed mean +/- standard deviation".format(seed_count))
         axis.grid(axis="y", alpha=0.22)
@@ -250,7 +260,7 @@ def deduplicated_sensitivity_plot():
             values = [100 * metrics[subset][name][metric] for name in names]
             axis.plot(x, values, marker="o", linewidth=1.8, markersize=5,
                       label=label, color=color)
-        axis.set_xticks(x, names)
+        axis.set_xticks(x, display_labels(names))
         axis.set_ylabel("{} (%)".format(metric.upper()))
         axis.set_title("Three-seed mean {}".format(metric.upper()))
         axis.grid(alpha=0.22)
@@ -298,6 +308,8 @@ def architecture_figure():
 
 
 def complexity_table():
+    from src.network.conv_based.ThesisFourStageUNet import ThesisFourStageUNet
+
     model = ThesisFourStageUNet("UABCD")
     groups = {
         "U-Net backbone": "backbone.",
@@ -316,6 +328,8 @@ def complexity_table():
 
 
 def load_model(variant, checkpoint, device):
+    from src.network.conv_based.ThesisFourStageUNet import ThesisFourStageUNet
+
     model = ThesisFourStageUNet(variant).to(device)
     model.load_progressive_checkpoint(checkpoint)
     model.eval()
@@ -323,6 +337,12 @@ def load_model(variant, checkpoint, device):
 
 
 def qualitative_figure(metrics):
+    import cv2
+    import torch
+
+    from src.dataloader.dataset import MedicalDataSets
+    from train_unet import ValTransform
+
     delta = metrics["UABCD"]["iou"] - metrics["U"]["iou"]
     final = metrics["UABCD"]["iou"]
     selected_positions = [
@@ -340,7 +360,7 @@ def qualitative_figure(metrics):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     models = {name: load_model(name, CHECKPOINTS[name], device)
               for name in ("U", "UAB", "UABC", "UABCD")}
-    columns = ["Image + GT", "U", "UAB", "UABC", "UABCD"]
+    columns = ["Image + GT", "U-Net", "LGR-UNet", "LGR-UNet+C", "BUR-UNet"]
     fig, axes = plt.subplots(len(selected_cases), len(columns), figsize=(15, 11))
     prediction_dir = os.path.join(FIGURE_DIR, "qualitative_masks")
     os.makedirs(prediction_dir, exist_ok=True)

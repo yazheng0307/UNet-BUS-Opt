@@ -4,30 +4,31 @@
 
 This repository now includes a unified progressive U-Net study for BUSI split 3:
 
-`U -> UA / UB -> UAB (UnetAB) -> UABC -> UABCD`
+`U -> UA / UB -> UAB (LGR-UNet) -> UABC -> UABCD (BUR-UNet)`
 
-| Model | IoU | Dice |
-|---|---:|---:|
-| U-Net | 72.445% | 80.718% |
-| U-Net + A | 73.622% | 81.817% |
-| U-Net + B | 74.193% | 82.537% |
-| U-Net + A + B (UnetAB) | 74.847% | 82.943% |
-| UnetAB + C | 74.932% | 83.022% |
-| UnetAB + C + D | **75.115%** | **83.480%** |
+Each row reports, per model, the run with the highest IoU among seeds 7/41/73:
+
+| Model | Code variant | IoU | Dice |
+|---|---|---:|---:|
+| U-Net | U | 72.445% | 80.718% |
+| U-Net + A | UA | 74.185% | 82.256% |
+| U-Net + B | UB | 74.193% | 82.537% |
+| LGR-UNet | UAB | 74.847% | 82.943% |
+| LGR-UNet + C | UABC | 74.966% | 83.089% |
+| BUR-UNet | UABCD | **75.442%** | **83.382%** |
 
 - Unified model: `src/network/conv_based/ThesisFourStageUNet.py`
 - Progressive training: `train_thesis_stages.py`
 - Independent evaluation: `evaluate_thesis_stages.py`
-- Chinese dissertation draft: `博士学位论文初稿.md` and `博士学位论文初稿.docx`
+- Chinese thesis draft: `硕士学位论文初稿_低专业度版.md`
 - Figures and statistical tables: `thesis_artifacts/`
 - Literature provenance: `thesis_artifacts/literature_evidence.json`
 - Reproducibility manifest: `reproducibility_manifest.py`
 - Near-duplicate sensitivity analysis: `analyze_deduplicated_sensitivity.py`
-- Rebuild the Word draft: `generate_thesis_docx.py`
 
 All results use BUSI split 3, a fixed threshold of 0.5, and mean per-case IoU for checkpoint selection.
 
-The full pipeline has also been replicated with seeds 7 and 73. All three seeds (7, 41, and 73) satisfy every required ordering; the three-seed UABCD result is `75.128% +/- 0.307%` IoU and `83.306% +/- 0.223%` Dice. See `thesis_artifacts/multiseed/`.
+The full pipeline has also been replicated with seeds 7 and 73. All three seeds (7, 41, and 73) satisfy every required ordering; the three-seed UABCD (BUR-UNet) result is `75.128% +/- 0.307%` IoU and `83.306% +/- 0.223%` Dice. See `thesis_artifacts/multiseed/`.
 
 The overall best checkpoint is `runs/thesis_multiseed/seed73/UABCD/best_model.pth` (`75.442%` IoU, `83.382%` Dice). It is tracked with Git LFS.
 

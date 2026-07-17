@@ -45,7 +45,7 @@ PARAGRAPH_REWRITES = {
         "A、B、C、D 均通过零残差方式接入，新增模块启用时的初始输出与前一级模型逐像素完全一致，实测最大绝对差为 0。"
         "全部实验固定使用 BUSI split 3，其中训练集 452 例、验证集 195 例，固定阈值为 0.5，并按照逐病例平均 IoU 选择模型。"
     ): (
-        "为了公平比较各模块，本文使用同一套代码建立 U、UA、UB、UAB、UABC 和 UABCD 六种模型。"
+        "为了公平比较各模块，本文使用同一套代码建立 U、UA、UB、UAB、UABC 和 UABCD 六种模型，其中 UAB 为 LGR-UNet、UABCD 为 BUR-UNet。"
         "每次加入新模块时，先把该模块设置为不改变原模型输出的状态，再继续训练。测试表明，相邻阶段在继续训练前的最大输出差为 0。"
         "所有实验都使用 BUSI 的 split 3，训练集为 452 例，验证集为 195 例。预测阈值固定为 0.5，并根据每个病例 IoU 的平均值保存最佳模型。"
     ),
@@ -86,8 +86,8 @@ PARAGRAPH_REWRITES = {
         "B 在瓶颈处建立通道图并进行全局语义传播；解码器融合跳跃特征得到粗分割。第二章实验部分在 UnetAB 上进一步接入 C 和 D："
         "C 从边界及有符号距离恢复连续几何，D 利用不确定性分别执行漏分增补和误分删除。"
     ): (
-        "整个方法分为两个阶段。第一阶段先用 U-Net 提取不同尺度的特征，A 根据图像内容对三个特征分支加权，B 再补充不同通道之间的整体联系，得到 UnetAB。"
-        "第二阶段以 UnetAB 为起点，C 利用边界和距离信息调整轮廓，D 再重点修改模型不确定区域中的漏分和误分。"
+        "整个方法分为两个阶段。第一阶段先用 U-Net 提取不同尺度的特征，A 根据图像内容对三个特征分支加权，B 再补充不同通道之间的整体联系，得到本文提出的 LGR-UNet。"
+        "第二阶段以 LGR-UNet 为语义基础，C 利用边界和距离信息调整轮廓，D 再重点修改模型不确定区域中的漏分和误分，最终形成 BUR-UNet。"
     ),
     (
         "U-Net 编码器的固定卷积路径对所有病例执行相同操作。对于高噪声图像，模型需要抑制局部随机响应；对于小病灶，过度平滑会损失关键结构；"
@@ -96,6 +96,7 @@ PARAGRAPH_REWRITES = {
     ): (
         "U-Net 对所有图像使用相同的卷积操作，但不同图像的问题并不相同。噪声较多时需要适当平滑，小病灶需要保留细节，边界模糊时则需要参考更大的周围区域。"
         "因此，A 使用三个分支分别处理这三种情况。局部特征增强后，模型还需要从整体上判断这些特征是否属于同一病灶，所以在 A 后加入 B。"
+        "本章提出的组合模型（同时包含 A、B）称为 LGR-UNet（局部—全局表征增强 U-Net，代码变体 UAB）。"
     ),
     (
         "图 3-1 和表 3-1 表明，两项指标均满足 $U<U+A$、$U<U+B$ 且 $U+A+B$ 最优。A 的增益说明多挑战路由能够改善固定卷积路径；"
@@ -110,8 +111,8 @@ PARAGRAPH_REWRITES = {
         "UnetAB 改善了病灶语义定位，但区域监督无法充分描述轮廓的方向与距离。模糊边界附近的少量像素偏移可能对小病灶 IoU 产生较大影响。"
         "进一步地，边界修正后仍会存在孤立误分和局部漏分，其修正方向不同。本章先由 C 将离散区域转换为边界与距离几何，再由 D 根据不确定性执行双向纠错。"
     ): (
-        "UnetAB 已经能够找到大部分病灶区域，但对边界位置考虑得还不够细。对于小病灶，边界只偏移几个像素也会明显影响 IoU。"
-        "此外，边界调整后仍可能出现漏分和误分。为此，本章先用 C 根据边界和距离信息调整轮廓，再用 D 找出不确定区域并分别修正两类错误。"
+        "LGR-UNet 已经能够找到大部分病灶区域，但对边界位置考虑得还不够细。对于小病灶，边界只偏移几个像素也会明显影响 IoU。"
+        "此外，边界调整后仍可能出现漏分和误分。为此，本章先用 C 根据边界和距离信息调整轮廓，再用 D 找出不确定区域并分别修正两类错误，最终形成本文的最终模型 BUR-UNet（边界—不确定性修正 U-Net）。"
     ),
     (
         "上述现象与 D 的设计目标一致：UDER 只在高不确定区域产生有效残差，对多数已经正确的病例应接近恒等映射；"
@@ -125,8 +126,8 @@ PARAGRAPH_REWRITES = {
         "第一章通过 TriCAR 和 CGR-Bridge 建立局部挑战适配与全局语义一致性，得到本章最优 UnetAB。"
         "第二章通过 BD-CoRefine 和 UDER 将语义输出进一步转换为边界—距离几何并执行双向误差修正，得到最终 UABCD。"
     ): (
-        "本文以 U-Net 为基础，依次加入四个功能明确的模块。A 根据图像情况组合三种局部特征，B 补充全局特征关系，二者共同组成 UnetAB。"
-        "在此基础上，C 使用边界和距离信息调整轮廓，D 重点修正不确定区域中的漏分和误分，最终得到 UABCD。"
+        "本文以 U-Net 为基础，依次加入四个功能明确的模块。A 根据图像情况组合三种局部特征，B 补充全局特征关系，二者共同组成 LGR-UNet。"
+        "在此基础上，C 使用边界和距离信息调整轮廓，D 重点修正不确定区域中的漏分和误分，最终得到 BUR-UNet。"
     ),
 }
 
@@ -250,19 +251,20 @@ POST_REPLACEMENTS = [
     ("2. 提出**轻量全局关系增强模块 全局关系增强模块**。模块以归一化通道特征构图，在 FP32 中完成关系信息计算，并通过有界以残差形式加回瓶颈特征。",
      "2. 设计**全局关系增强模块 B**。该模块在网络最深层计算不同特征通道之间的关系，再把得到的全局信息加回原特征，用于减少只看局部区域造成的误分。"),
     ("3. 提出**边界—距离协同细化 边界细化模块**。模块联合学习边界和连续有符号距离场，通过边界修正量修正区域预测。",
-     "3. 设计**边界细化模块 C**。该模块同时预测病灶边界和像素到边界的距离，并利用这两类信息调整 UnetAB 的分割轮廓。"),
+     "3. 设计**边界细化模块 C**。该模块同时预测病灶边界和像素到边界的距离，并利用这两类信息调整 LGR-UNet 的分割轮廓。"),
     ("4. 提出**不确定性驱动双误差修正 不确定区域修正模块**。模块联合预测熵与不同尺度预测之间的差异，显式拆分假阴性增补和假阳性删除，形成从语义到几何再到误差的处理流程。",
      "4. 设计**不确定区域修正模块 D**。该模块结合预测概率和不同尺度输出的差异找到容易出错的区域，再使用两个独立分支分别修正漏分和误分。"),
     ("5. 建立**可直接继承参数的的渐进验证协议**。六个模型变体共享状态字典，每次新增模块均经过最大输出差为零的一致性测试，降低因结构重建和随机初始化造成的比较误差。",
      "5. 建立**逐步训练和对比实验方法**。六种模型使用同一基础结构，每次加入新模块时都先保证输出不变，再继续训练，从而使各阶段的比较更加公平。"),
-    ("第 3 章研究 A、B 两个语义模块并得到 UnetAB。", "第 3 章研究 A、B 两个特征增强模块并得到 UnetAB。"),
+    ("第 3 章研究 A、B 两个语义模块并得到 UnetAB。", "第 3 章研究 A、B 两个特征增强模块并得到 LGR-UNet。"),
+    ("第 4 章研究 C、D 两个细化模块并得到最终 UABCD。", "第 4 章研究 C、D 两个细化模块并得到最终的 BUR-UNet。"),
     ("该协议体现“先语义、后几何、再纠错”的研究假设。", "该训练顺序体现“先定位病灶，再调整边界，最后修正错误”的思路。"),
     ("关系信息计算与以残差形式加回为：", "关系计算和结果回加过程为："),
     ("因此 B 同样满足无扰动接入。", "因此，加入 B 时也不会立即改变原模型输出。"),
     ("结果说明 B 的独立增益具有更稳定的在不同病例上的表现，A 的贡献更依赖病例类型；",
      "结果说明 B 在不同病例上的提升相对更稳定，而 A 的效果更容易受到病例类型影响；"),
     ("本章建立了 A 与 B 的逻辑链。A 负责根据局部困难类型组织特征，B 负责将局部证据整合为全局一致语义。统一实验得到 UAB 最优，并将其命名为 UnetAB，作为下一章唯一固定起点。",
-     "本章先使用 A 处理噪声、小病灶和模糊边界等局部问题，再使用 B 补充整体特征关系。实验中 UAB 的 IoU 和 Dice 均为本章最高，因此将其命名为 UnetAB，并作为下一章的基础模型。"),
+     "本章先使用 A 处理噪声、小病灶和模糊边界等局部问题，再使用 B 补充整体特征关系。实验中同时包含 A、B 的组合模型 IoU 和 Dice 均为本章最高，因此将其命名为 LGR-UNet，并作为下一章的基础模型。"),
     ("距离分支使用 Smooth L1 损失，使网络获得病灶内外方向和到边界的连续的边界距离信息。",
      "距离分支使用 Smooth L1 损失，使网络能够判断像素位于病灶内部还是外部，并学习像素到边界的距离。"),
     ("熵反映单输出置信度，尺度分歧反映不同语义层级之间的不一致，两者具有互补性。",
@@ -272,12 +274,12 @@ POST_REPLACEMENTS = [
      "其中，$R_{FN}$ 用于补充漏掉的病灶区域，$R_{FP}$ 用于删除错误预测的前景区域。"),
     ("基于验证耐心的提前设定的早停规则", "提前设定的早停规则"),
     ("本章在固定 UnetAB 上依次加入 C 与 D，建立从区域语义、边界距离到不确定性纠错的处理流程。两项指标均形成严格递增关系，UABCD 为最终模型。逐病例分析同时表明，C、D 的收益尚不稳定，后续工作应针对完全漏检病例和 D 引起的轻度退化开展专门研究。",
-     "本章在 UnetAB 上依次加入 C 和 D。C 负责调整边界，D 负责修正不确定区域。IoU 和 Dice 均按照 UnetAB、UABC、UABCD 的顺序提高，因此 UABCD 是本章的最终模型。不过，逐病例结果说明 C 和 D 的提升还不够稳定，后续仍需继续改进。"),
+     "本章在 LGR-UNet 上依次加入 C 和 D。C 负责调整边界，D 负责修正不确定区域。IoU 和 Dice 均按照 LGR-UNet、边界细化型 LGR-UNet、BUR-UNet 的顺序提高，因此 BUR-UNet 是本章的最终模型。不过，逐病例结果说明 C 和 D 的提升还不够稳定，后续仍需继续改进。"),
     ("全局整体判断能力", "整体判断能力"),
     ("自然图像预训练主干可以提高绝对指标，但它们不直接提供 A-D 的递进归因。",
      "使用自然图像预训练的主干可以提高指标，但不能直接说明 A—D 四个模块分别带来了多少提升。"),
     ("只有建立稳定语义模型并采用不改变原输出的渐进训练后才获得正向平均结果。这支持本文的核心逻辑：几何与不确定性细化依赖可靠语义起点，模块顺序不是任意排列。",
-     "只有先得到较稳定的 UnetAB，并采用加入模块时保持原输出不变的训练方法，C 和 D 才取得正向结果。这说明边界调整和错误修正需要建立在较准确的病灶定位结果上，四个模块的加入顺序有实际依据。"),
+     "只有先得到较稳定的 LGR-UNet，并采用加入模块时保持原输出不变的训练方法，C 和 D 才取得正向结果。这说明边界调整和错误修正需要建立在较准确的病灶定位结果上，四个模块的加入顺序有实际依据。"),
     ("比 去重子集", "比去重子集"),
     ("在 去重子集", "在去重子集"),
     ("具有稳健性", "仍能保持"),
@@ -291,7 +293,7 @@ POST_REPLACEMENTS = [
 ]
 
 
-MAPPING_INSERT = """本文中四个模块采用容易理解的功能名称。为了与程序代码对应，表 1-1 给出论文名称和代码实现的关系。\n\n| 模块 | 论文中的名称 | 主要作用 | 代码中的对应实现 |\n|---|---|---|---|\n| A | 多特征增强模块 | 分别处理噪声、小病灶和模糊边界特征 | `StableTriChallengeAdapter` |\n| B | 全局关系增强模块 | 补充不同特征通道之间的整体联系 | `ChannelGraphReasoning` |\n| C | 边界细化模块 | 使用边界和距离信息调整分割轮廓 | `BoundaryDistanceCooperativeHead` |\n| D | 不确定区域修正模块 | 分别修正容易出错区域中的漏分和误分 | `UncertaintyDrivenDualErrorRefinement` |\n\n"""
+MAPPING_INSERT = """本文中四个模块采用容易理解的功能名称。为了与程序代码对应，表 1-1 给出论文名称和代码实现的关系。\n\n| 模块 | 论文中的名称 | 主要作用 | 代码中的对应实现 |\n|---|---|---|---|\n| A | 多特征增强模块 | 分别处理噪声、小病灶和模糊边界特征 | `StableTriChallengeAdapter` |\n| B | 全局关系增强模块 | 补充不同特征通道之间的整体联系 | `ChannelGraphReasoning` |\n| C | 边界细化模块 | 使用边界和距离信息调整分割轮廓 | `BoundaryDistanceCooperativeHead` |\n| D | 不确定区域修正模块 | 分别修正容易出错区域中的漏分和误分 | `UncertaintyDrivenDualErrorRefinement` |\n\n为了区分正文使用的模型称谓与代码实现中的变体标识，表 1-2 给出二者的对应关系。正文一律使用具有含义的模型称谓，`UAB/UABC/UABCD` 等代码标识仅在表格的“代码变体”列、附录训练命令与运行目录中保留。\n\n| 代码标识 | 论文称谓 | 英文全称 | 使用场景 |\n|---|---|---|---|\n| U | 基础 U-Net | — | 基线 |\n| UA | 局部特征增强变体 | — | 单模块消融 |\n| UB | 全局关系增强变体 | — | 单模块消融 |\n| UAB | LGR-UNet | Local-Global Representation-enhanced U-Net | 第 3 章提出模型 |\n| UABC | 边界细化型 LGR-UNet | — | 第 4 章中间阶段 |\n| UABCD | BUR-UNet | Boundary-Uncertainty Refinement U-Net | 第 4 章最终模型 |\n\n"""
 
 
 MAINSTREAM_REVIEW = """### 1.3.2 主流对比模型介绍
@@ -329,18 +331,18 @@ REFERENCE_ROWS = """| U-Net | 34.52 | 139.32 | 65.52 GFLOPs | 68.61 | 76.97 |
 
 CHAPTER3_COMPARISON = """## 3.5 与主流模型的参考对比
 
-原项目在 BUSI 的 647 个病灶病例上报告了主流模型结果。经原仓库作者确认，原表“±”前的数值对应固定 split 3 的训练结果，因此本节采用这些数值[36]。本文模型在 seed 7、41 和 73 中按照 IoU 选择最优运行，并报告同一次运行对应的 Dice。UnetAB 的最优运行是 seed 41，IoU 为 74.847%，Dice 为 82.943%。
+原项目在 BUSI 的 647 个病灶病例上报告了主流模型结果。经原仓库作者确认，原表“±”前的数值对应固定 split 3 的训练结果，因此本节采用这些数值[36]。本文模型在 seed 7、41 和 73 中按照 IoU 选择最优运行，并报告同一次运行对应的 Dice。LGR-UNet 的最优运行是 seed 41，IoU 为 74.847%，Dice 为 82.943%。
 
 | 模型 | 参数量/M | FPS | 计算量（原报告口径） | IoU/% | Dice/% |
 |---|---:|---:|---:|---:|---:|
 {rows}
-| **UnetAB（本文，seed 41）** | **11.28** | 约112.2 | 19.42 GMACs | **74.847** | **82.943** |
+| **LGR-UNet（本文，seed 41，代码变体 UAB）** | **11.28** | 约112.2 | 19.42 GMACs | **74.847** | **82.943** |
 
 ### 3.5.1 差值描述性分析
 
-本节所列参考模型中，CMUNeXt 的 IoU 和 Dice 最高，分别为 71.56% 和 79.86%。UnetAB 比 CMUNeXt 高 3.287 个 IoU 百分点和 3.083 个 Dice 百分点；比参考 U-Net 高 6.237 个 IoU 百分点和 5.973 个 Dice 百分点。以上差值是在固定 split 3 汇总指标上的直接相减，用于说明性能差距，不等同于统计显著性。
+本节所列参考模型中，CMUNeXt 的 IoU 和 Dice 最高，分别为 71.56% 和 79.86%。LGR-UNet 比 CMUNeXt 高 3.287 个 IoU 百分点和 3.083 个 Dice 百分点；比参考 U-Net 高 6.237 个 IoU 百分点和 5.973 个 Dice 百分点。以上差值是在固定 split 3 汇总指标上的直接相减，用于说明性能差距，不等同于统计显著性。
 
-| 参照模型 | UnetAB的IoU差值/百分点 | UnetAB的Dice差值/百分点 |
+| 参照模型 | LGR-UNet的IoU差值/百分点 | LGR-UNet的Dice差值/百分点 |
 |---|---:|---:|
 | U-Net | +6.237 | +5.973 |
 | Attention U-Net | +6.297 | +6.063 |
@@ -353,26 +355,26 @@ CHAPTER3_COMPARISON = """## 3.5 与主流模型的参考对比
 | CMU-Net | +3.427 | +3.453 |
 | CMUNeXt | +3.287 | +3.083 |
 
-UnetAB 约有 11.28M 实际使用参数，比参考 U-Net 的 34.52M 少约 67.3%，比 TransUnet 的 105.32M 少约 89.3%，但约为 CMUNeXt 参数量的 3.59 倍。这说明 UnetAB 在分割精度和模型大小之间取得了折中，但并不是参数最少的模型。参考表使用 GFLOPs，本文复杂度脚本使用 GMACs；参考模型和本文模型的速度测试硬件也没有完全统一，因此 FPS 和计算量只作描述，不进行显著性判断。
+LGR-UNet 约有 11.28M 实际使用参数，比参考 U-Net 的 34.52M 少约 67.3%，比 TransUnet 的 105.32M 少约 89.3%，但约为 CMUNeXt 参数量的 3.59 倍。这说明 LGR-UNet 在分割精度和模型大小之间取得了折中，但并不是参数最少的模型。参考表使用 GFLOPs，本文复杂度脚本使用 GMACs；参考模型和本文模型的速度测试硬件也没有完全统一，因此 FPS 和计算量只作描述，不进行显著性判断。
 
 ### 3.5.2 本文模型的内部配对检验
 
-主流模型目前只有汇总指标，没有保存与本文完全对应的 195 例逐病例预测，因此不能严谨计算 UnetAB 相对 CMUNeXt 等模型的配对 p 值。统计检验只在本文保存了逐病例结果的模型之间进行。本文采用单侧 Wilcoxon 配对符号秩检验，并用 20,000 次 Bootstrap 给出平均差的 95% 置信区间。
+主流模型目前只有汇总指标，没有保存与本文完全对应的 195 例逐病例预测，因此不能严谨计算 LGR-UNet 相对 CMUNeXt 等模型的配对 p 值。统计检验只在本文保存了逐病例结果的模型之间进行。本文采用单侧 Wilcoxon 配对符号秩检验，并用 20,000 次 Bootstrap 给出平均差的 95% 置信区间。
 
 | 配对比较 | 指标 | 平均提升/百分点 | Bootstrap 95%区间 | 单侧 p 值 | 结论 |
 |---|---|---:|---:|---:|---|
-| UAB seed 41 对 U | IoU | +2.402 | [0.896, 4.058] | 0.0211 | 显著 |
-| UAB seed 41 对 U | Dice | +2.225 | [0.736, 3.849] | 0.0231 | 显著 |
-| UAB seed 41 对 UB seed 41 | IoU | +0.655 | [-0.067, 1.511] | 0.0931 | 不显著 |
-| UAB seed 41 对 UB seed 41 | Dice | +0.406 | [-0.266, 1.213] | 0.0958 | 不显著 |
+| LGR-UNet（seed 41）对 基础 U-Net | IoU | +2.402 | [0.896, 4.058] | 0.0211 | 显著 |
+| LGR-UNet（seed 41）对 基础 U-Net | Dice | +2.225 | [0.736, 3.849] | 0.0231 | 显著 |
+| LGR-UNet（seed 41）对 全局关系增强变体（seed 41） | IoU | +0.655 | [-0.067, 1.511] | 0.0931 | 不显著 |
+| LGR-UNet（seed 41）对 全局关系增强变体（seed 41） | Dice | +0.406 | [-0.266, 1.213] | 0.0958 | 不显著 |
 
-结果表明，UnetAB 相对基础 U-Net 的两项指标均达到 `p<0.05`，且平均差置信区间不跨 0，可以认为 A+B 组合相对基线具有统计显著优势。但 UAB 相对较强的 UB 仅有小幅提升，尚未达到 `p<0.05`。因此，本章能够支持“组合模型明显优于基础 U-Net”，但不能把 A 在 B 之后的增量写成已经稳定显著。
+结果表明，LGR-UNet 相对基础 U-Net 的两项指标均达到 `p<0.05`，且平均差置信区间不跨 0，可以认为 A+B 组合相对基线具有统计显著优势。但 LGR-UNet 相对较强的全局关系增强变体仅有小幅提升，尚未达到 `p<0.05`。因此，本章能够支持“组合模型明显优于基础 U-Net”，但不能把 A 在 B 之后的增量写成已经稳定显著。
 
 ### 3.5.3 为什么 A 和 B 能够带来提升
 
 1. **A 与乳腺超声中的具体困难对应。** 噪声处理分支先做局部平均，小病灶分支保留紧凑细节，边界分支使用较大范围的卷积。根据图像内容计算三个分支的权重，可以减少一种固定卷积同时处理所有困难时的冲突。
-2. **B 补充了 U-Net 较弱的整体判断能力。** B 在网络最深层计算通道关系，把分散在不同位置和通道中的病灶信息联系起来。这有助于保留真正的病灶响应，并压低远离病灶的错误前景。UB 相对 U 的 IoU 和 Dice 置信区间均不跨 0，也与这一作用相符。
-3. **A 和 B 处理的问题不同。** A 先改善局部特征，B 再从整体上检查这些特征是否一致。两者按顺序连接后，UAB 同时高于 UA 和 UB，说明局部增强和整体关系并不是简单重复。
+2. **B 补充了 U-Net 较弱的整体判断能力。** B 在网络最深层计算通道关系，把分散在不同位置和通道中的病灶信息联系起来。这有助于保留真正的病灶响应，并压低远离病灶的错误前景。全局关系增强变体相对基础 U-Net 的 IoU 和 Dice 置信区间均不跨 0，也与这一作用相符。
+3. **A 和 B 处理的问题不同。** A 先改善局部特征，B 再从整体上检查这些特征是否一致。两者按顺序连接后，LGR-UNet 同时高于两个单模块变体（局部特征增强变体和全局关系增强变体），说明局部增强和整体关系并不是简单重复。
 4. **不改变原输出的初始化提高了训练稳定性。** A、B 刚加入时不会破坏已有分割结果，后续训练只需学习有用的修正量，因此比从随机输出直接联合训练更稳定。
 
 """.format(rows=REFERENCE_ROWS)
@@ -380,18 +382,18 @@ UnetAB 约有 11.28M 实际使用参数，比参考 U-Net 的 34.52M 少约 67.3
 
 CHAPTER4_COMPARISON = """## 4.5 与主流模型的参考对比
 
-第二章继续使用固定 split 3 的主流模型结果。UABCD 在三个随机种子中按 IoU 选择最优运行，seed 73 的 IoU 最高，为 75.442%，该次运行对应的 Dice 为 83.382%。虽然 seed 41 的 Dice 为 83.480%，但本文不把不同种子的最大 IoU 和最大 Dice 拼接为一条结果。
+第二章继续使用固定 split 3 的主流模型结果。BUR-UNet 在三个随机种子中按 IoU 选择最优运行，seed 73 的 IoU 最高，为 75.442%，该次运行对应的 Dice 为 83.382%。虽然 seed 41 的 Dice 为 83.480%，但本文不把不同种子的最大 IoU 和最大 Dice 拼接为一条结果。
 
 | 模型 | 参数量/M | FPS | 计算量（原报告口径） | IoU/% | Dice/% |
 |---|---:|---:|---:|---:|---:|
 {rows}
-| **UABCD（本文，seed 73）** | **11.31** | 约99.7 | 21.40 GMACs | **75.442** | **83.382** |
+| **BUR-UNet（本文，seed 73，代码变体 UABCD）** | **11.31** | 约99.7 | 21.40 GMACs | **75.442** | **83.382** |
 
 ### 4.5.1 差值描述性分析
 
-UABCD 比本节参考结果最好的 CMUNeXt 高 3.882 个 IoU 百分点和 3.522 个 Dice 百分点，比参考 U-Net 高 6.832 个 IoU 百分点和 6.412 个 Dice 百分点。UABCD 约有 11.31M 参数，比 CMUNeXt 大约 3.60 倍，但仍明显小于参考 U-Net、U-Net++、U-Net3+、TransUnet、SwinUnet 和 CMU-Net。
+BUR-UNet 比本节参考结果最好的 CMUNeXt 高 3.882 个 IoU 百分点和 3.522 个 Dice 百分点，比参考 U-Net 高 6.832 个 IoU 百分点和 6.412 个 Dice 百分点。BUR-UNet 约有 11.31M 参数，比 CMUNeXt 大约 3.60 倍，但仍明显小于参考 U-Net、U-Net++、U-Net3+、TransUnet、SwinUnet 和 CMU-Net。
 
-| 参照模型 | UABCD的IoU差值/百分点 | UABCD的Dice差值/百分点 |
+| 参照模型 | BUR-UNet的IoU差值/百分点 | BUR-UNet的Dice差值/百分点 |
 |---|---:|---:|
 | U-Net | +6.832 | +6.412 |
 | Attention U-Net | +6.892 | +6.502 |
@@ -404,27 +406,27 @@ UABCD 比本节参考结果最好的 CMUNeXt 高 3.882 个 IoU 百分点和 3.52
 | CMU-Net | +4.022 | +3.892 |
 | CMUNeXt | +3.882 | +3.522 |
 
-在 seed 73 的同一条渐进训练链中，UnetAB 的 IoU/Dice 为 74.590%/82.789%，加入 C 和 D 后提高到 75.442%/83.382%，即提高 0.852 和 0.593 个百分点。模型参数量只比 UnetAB 增加约 0.03M，但计算量从 19.42 GMACs 增加到 21.40 GMACs，单张延迟从 8.91 ms 增加到 10.03 ms。C 和 D 的参数开销较小，但全分辨率边界分支和多尺度辅助输出会增加一定计算时间。
+在 seed 73 的同一条渐进训练链中，LGR-UNet 的 IoU/Dice 为 74.590%/82.789%，加入 C 和 D 后提高到 75.442%/83.382%，即提高 0.852 和 0.593 个百分点。模型参数量只比 LGR-UNet 增加约 0.03M，但计算量从 19.42 GMACs 增加到 21.40 GMACs，单张延迟从 8.91 ms 增加到 10.03 ms。C 和 D 的参数开销较小，但全分辨率边界分支和多尺度辅助输出会增加一定计算时间。
 
 ### 4.5.2 本文模型的内部配对检验
 
-表中主流模型没有逐病例预测文件，因此下列统计检验仍限定在本文模型内部。UABCD 与 UnetAB 的比较使用同为 seed 73 的 195 个病例，避免把不同种子结果强行配对；与 U-Net 的比较使用公共基线逐病例结果。
+表中主流模型没有逐病例预测文件，因此下列统计检验仍限定在本文模型内部。BUR-UNet 与 LGR-UNet 的比较使用同为 seed 73 的 195 个病例，避免把不同种子结果强行配对；与 U-Net 的比较使用公共基线逐病例结果。
 
 | 配对比较 | 指标 | 平均提升/百分点 | Bootstrap 95%区间 | 单侧 p 值 | 结论 |
 |---|---|---:|---:|---:|---|
-| UABCD seed 73 对 UAB seed 73 | IoU | +0.852 | [-0.051, 1.793] | 0.0038 | 秩检验显著，均值区间跨0 |
-| UABCD seed 73 对 UAB seed 73 | Dice | +0.593 | [-0.292, 1.472] | 0.0042 | 秩检验显著，均值区间跨0 |
-| UABCD seed 73 对 U | IoU | +2.997 | [1.439, 4.706] | 0.0025 | 显著 |
-| UABCD seed 73 对 U | Dice | +2.664 | [1.267, 4.223] | 0.0034 | 显著 |
+| BUR-UNet（seed 73）对 LGR-UNet（seed 73） | IoU | +0.852 | [-0.051, 1.793] | 0.0038 | 秩检验显著，均值区间跨0 |
+| BUR-UNet（seed 73）对 LGR-UNet（seed 73） | Dice | +0.593 | [-0.292, 1.472] | 0.0042 | 秩检验显著，均值区间跨0 |
+| BUR-UNet（seed 73）对 基础 U-Net | IoU | +2.997 | [1.439, 4.706] | 0.0025 | 显著 |
+| BUR-UNet（seed 73）对 基础 U-Net | Dice | +2.664 | [1.267, 4.223] | 0.0034 | 显著 |
 
-UABCD 相对 U-Net 的两项检验均达到 `p<0.01`，且平均差置信区间不跨 0，可以认为最终模型相对基础 U-Net 具有统计显著优势。UABCD 相对同 seed 的 UnetAB 有 112 例改善、82 例下降，Wilcoxon 检验也达到 `p<0.01`；但平均提升的 Bootstrap 区间仍跨 0，说明少数病例的较大波动会影响平均值。较准确的结论是“多数病例的排序变化支持提升，但平均增益仍需更多随机种子验证”。另外，由于 seed 73 是从三个种子中按 IoU 选出的最优运行，这些 p 值属于选择后的探索性结果，不能替代预先指定种子的独立验证。
+BUR-UNet 相对 U-Net 的两项检验均达到 `p<0.01`，且平均差置信区间不跨 0，可以认为最终模型相对基础 U-Net 具有统计显著优势。BUR-UNet 相对同 seed 的 LGR-UNet 有 112 例改善、82 例下降，Wilcoxon 检验也达到 `p<0.01`；但平均提升的 Bootstrap 区间仍跨 0，说明少数病例的较大波动会影响平均值。较准确的结论是“多数病例的排序变化支持提升，但平均增益仍需更多随机种子验证”。另外，由于 seed 73 是从三个种子中按 IoU 选出的最优运行，这些 p 值属于选择后的探索性结果，不能替代预先指定种子的独立验证。
 
 ### 4.5.3 为什么 C 和 D 能够继续提升结果
 
 1. **C 为边界调整提供了方向信息。** 普通 Dice 和 BCE 主要判断像素属于前景还是背景，不能直接告诉模型边界应向内还是向外移动。C 同时学习边界和有符号距离，使靠近轮廓的像素获得更明确的调整方向，因此能够修正少量边界偏移。
 2. **D 把漏分和误分分开处理。** 漏分需要增加病灶概率，误分需要降低病灶概率。D 使用两个独立分支完成相反操作，避免一个修正分支同时学习两种方向时相互干扰。
 3. **不确定性让 D 重点修改易错区域。** 预测熵可以找到概率接近 0.5 的像素，不同尺度输出的差异可以找到各层判断不一致的位置。两者结合后，D 不需要大范围改动已经分对的区域，而是把计算集中在模糊边界和疑似漏分区域。
-4. **C 和 D 建立在较好的 UnetAB 上。** A 和 B 已经完成主要病灶定位，C、D 只需学习较小的边界和错误修正量。早期实验中 C、D 从随机状态直接训练没有超过控制组，也说明它们依赖可靠的前级结果。
+4. **C 和 D 建立在较好的 LGR-UNet 上。** A 和 B 已经完成主要病灶定位，C、D 只需学习较小的边界和错误修正量。早期实验中 C、D 从随机状态直接训练没有超过控制组，也说明它们依赖可靠的前级结果。
 5. **增益仍然有限且存在病例差异。** C、D 主要改变少量像素，所以平均提升小于 A、B；Bootstrap 区间跨 0 也表明它们还没有在所有病例上稳定获益。这与模块作用范围较窄的设计相符，并提示后续需要针对完全漏检病例继续改进。
 
 """.format(rows=REFERENCE_ROWS)
@@ -448,37 +450,60 @@ ADDITIONAL_REFERENCES = """[31] Valanarasu J M J, Oza P, Hacihaliloglu I, Patel 
 BEST_SEED_REPLACEMENTS = [
     (
         "实验结果表明，第一部分中 U-Net、UA、UB 和 UAB 的 IoU 分别为 72.445%、73.622%、74.193% 和 74.847%，Dice 分别为 80.718%、81.817%、82.537% 和 82.943%。UAB 在两项指标上均为第一部分最优，并被命名为 UnetAB。第二部分以同一个 UnetAB 检查点为起点，UABC 和 UABCD 的 IoU 分别为 74.932% 和 75.115%，Dice 分别为 83.022% 和 83.480%，形成 UnetAB < UnetAB+C < UnetAB+C+D 的递进关系。最终模型包含约 11.31M 实际使用参数，在 RTX 4060 Laptop GPU 上处理单张 256×256 图像的平均前向延迟约为 10.03 ms。",
-        "实验结果采用三个随机种子中 IoU 最高的一次，并报告同一次运行的 Dice。第一部分中 U-Net、UA、UB 和 UAB 的 IoU 分别为 72.445%、74.185%、74.193% 和 74.847%，Dice 分别为 80.718%、82.256%、82.537% 和 82.943%。UAB 在两项指标上均为第一部分最优，并被命名为 UnetAB。第二部分中 UAB、UABC 和 UABCD 的 IoU 分别为 74.847%、74.966% 和 75.442%，Dice 分别为 82.943%、83.089% 和 83.382%，仍形成 UnetAB < UnetAB+C < UnetAB+C+D 的递进关系。最终模型包含约 11.31M 实际使用参数，在 RTX 4060 Laptop GPU 上处理单张 256×256 图像的平均前向延迟约为 10.03 ms。",
+        "实验结果采用三个随机种子中 IoU 最高的一次，并报告同一次运行的 Dice。第一部分中 U-Net、UA、UB 和 UAB 的 IoU 分别为 72.445%、74.185%、74.193% 和 74.847%，Dice 分别为 80.718%、82.256%、82.537% 和 82.943%。UAB 在两项指标上均为第一部分最优，即本文提出的 LGR-UNet。第二部分中 UAB、UABC 和 UABCD 的 IoU 分别为 74.847%、74.966% 和 75.442%，Dice 分别为 82.943%、83.089% 和 83.382%，即 LGR-UNet、边界细化型 LGR-UNet 和 BUR-UNet 呈递进提升。最终模型包含约 11.31M 实际使用参数，在 RTX 4060 Laptop GPU 上处理单张 256×256 图像的平均前向延迟约为 10.03 ms。",
     ),
     (
         "In Chapter 1, U, UA, UB, and UAB achieve IoU scores of 72.445%, 73.622%, 74.193%, and 74.847%, and Dice scores of 80.718%, 81.817%, 82.537%, and 82.943%, respectively. UAB is therefore denoted as UnetAB. In Chapter 2, UABC and UABCD further improve IoU to 74.932% and 75.115%, and Dice to 83.022% and 83.480%. Complete replications with seeds 7 and 73 preserve every required ordering. Across seeds 7, 41, and 73, UABCD obtains 75.128% +/- 0.307% IoU and 83.306% +/- 0.223% Dice. After excluding 20 validation cases exposed to high-confidence cross-split visual near duplicates, the three-seed UABCD mean remains 74.464% IoU and 82.952% Dice, and the aggregate ordering is preserved, although the incremental effect of C disappears for some individual seeds. The final model contains 11.31M active parameters and requires approximately 10.03 ms per 256×256 image on an RTX 4060 Laptop GPU. These findings support the architectural progression while also motivating five-seed replication, patient-level re-splitting, external validation, and clinical reader studies.",
-        "For the main tables, each model uses the run with the highest IoU among seeds 7, 41, and 73, together with the Dice from that same run. In Chapter 1, U, UA, UB, and UAB obtain 72.445%, 74.185%, 74.193%, and 74.847% IoU, and 80.718%, 82.256%, 82.537%, and 82.943% Dice. UAB is denoted as UnetAB. In Chapter 2, UABC and UABCD reach 74.966% and 75.442% IoU, and 83.089% and 83.382% Dice. Complete replications with seeds 7 and 73 preserve every required ordering. Across all three seeds, UABCD obtains 75.128% +/- 0.307% IoU and 83.306% +/- 0.223% Dice. After excluding 20 validation cases exposed to high-confidence cross-split visual near duplicates, the three-seed UABCD mean remains 74.464% IoU and 82.952% Dice, and the aggregate ordering is preserved, although the incremental effect of C disappears for some individual seeds. The final model contains 11.31M active parameters and requires approximately 10.03 ms per 256×256 image on an RTX 4060 Laptop GPU. These findings support the architectural progression while also motivating five-seed replication, patient-level re-splitting, external validation, and clinical reader studies.",
+        "For the main tables, each model uses the run with the highest IoU among seeds 7, 41, and 73, together with the Dice from that same run. In Chapter 1, U, UA, UB, and UAB obtain 72.445%, 74.185%, 74.193%, and 74.847% IoU, and 80.718%, 82.256%, 82.537%, and 82.943% Dice. UAB is the LGR-UNet. In Chapter 2, UABC and UABCD reach 74.966% and 75.442% IoU, and 83.089% and 83.382% Dice. Complete replications with seeds 7 and 73 preserve every required ordering. Across all three seeds, BUR-UNet obtains 75.128% +/- 0.307% IoU and 83.306% +/- 0.223% Dice. After excluding 20 validation cases exposed to high-confidence cross-split visual near duplicates, the three-seed BUR-UNet mean remains 74.464% IoU and 82.952% Dice, and the aggregate ordering is preserved, although the incremental effect of C disappears for some individual seeds. The final model contains 11.31M active parameters and requires approximately 10.03 ms per 256×256 image on an RTX 4060 Laptop GPU. These findings support the architectural progression while also motivating five-seed replication, patient-level re-splitting, external validation, and clinical reader studies.",
     ),
     (
         "| UA | ✓ |  | 73.622 | 81.817 | +1.177 |",
-        "| UA | ✓ |  | 74.185 | 82.256 | +1.740 |",
+        "| 局部特征增强变体 | UA | ✓ |  | 74.185 | 82.256 | +1.740 |",
     ),
     (
         "图 3-1 和表 3-1 表明，UA 和 UB 都优于基础 U-Net，UAB 的两项指标最高。A 说明针对噪声、小病灶和边界采用不同处理分支是有帮助的；B 的提升更大，说明整体特征关系对该数据集较重要。在 UB 上继续加入 A 后，IoU 提高 0.655 个百分点，Dice 提高 0.406 个百分点，说明 A 和 B 处理的问题不同，可以配合使用。",
-        "图 3-1 和表 3-1 使用各模型三个随机种子中 IoU 最高的一次。UA 和 UB 都优于基础 U-Net，UAB 的两项指标最高。A 和 B 相对 U-Net 的最佳 IoU 分别提高 1.740 和 1.748 个百分点。UAB 与 UB 的最优运行都来自 seed 41，在 UB 上继续加入 A 后，IoU 提高 0.655 个百分点，Dice 提高 0.406 个百分点，说明 A 和 B 处理的问题不同，可以配合使用。",
+        "图 3-1 和表 3-1 使用各模型三个随机种子中 IoU 最高的一次。局部特征增强变体和全局关系增强变体都优于基础 U-Net，LGR-UNet 的两项指标最高。A 和 B 相对基础 U-Net 的最佳 IoU 分别提高 1.740 和 1.748 个百分点。LGR-UNet 与全局关系增强变体的最优运行都来自 seed 41，在全局关系增强变体基础上继续加入 A 后，IoU 提高 0.655 个百分点，Dice 提高 0.406 个百分点，说明 A 和 B 处理的问题不同，可以配合使用。",
     ),
     (
         "| UnetAB+C | ✓ |  | 74.932 | 83.022 | +0.085 |",
-        "| UnetAB+C | ✓ |  | 74.966 | 83.089 | +0.119 |",
+        "| 边界细化型 LGR-UNet | UABC | ✓ |  | 74.966 | 83.089 | +0.119 |",
     ),
     (
         "| UnetAB+C+D | ✓ | ✓ | **75.115** | **83.480** | **+0.183** |",
-        "| UnetAB+C+D | ✓ | ✓ | **75.442** | **83.382** | **+0.476** |",
+        "| BUR-UNet | UABCD | ✓ | ✓ | **75.442** | **83.382** | **+0.476** |",
     ),
     (
         "结果满足 $UnetAB<UnetAB+C<UnetAB+C+D$，最终模型在 IoU 和 Dice 上均为第二章最优。C 带来的平均增益较小，表明 UnetAB 已完成主要区域定位，C 主要对边界像素进行微调。D 的 Dice 增益大于 IoU 增益，说明其对预测区域整体重合程度具有更明显影响。",
-        "按照三个随机种子中最高 IoU 选择结果后，仍满足 $UnetAB<UnetAB+C<UnetAB+C+D$，最终模型在 IoU 和 Dice 上均为第二章最优。UABC 相对 UnetAB 的 IoU 和 Dice 分别提高 0.119 和 0.146 个百分点；UABCD 相对 UABC 分别提高 0.476 和 0.293 个百分点。C 主要调整少量边界像素，D 继续修正漏分和误分，因此两步提升都小于第一章的 A、B。",
+        "按照三个随机种子中最高 IoU 选择结果后，LGR-UNet、边界细化型 LGR-UNet 和 BUR-UNet 仍呈严格递进提升，最终模型在 IoU 和 Dice 上均为第二章最优。边界细化型 LGR-UNet 相对 LGR-UNet 的 IoU 和 Dice 分别提高 0.119 和 0.146 个百分点；BUR-UNet 相对边界细化型 LGR-UNet 分别提高 0.476 和 0.293 个百分点。C 主要调整少量边界像素，D 继续修正漏分和误分，因此两步提升都小于第一章的 A、B。",
     ),
     (
         "统一 split 3 实验表明，第一章 U、UA、UB、UAB 的 IoU 为 72.445%、73.622%、74.193%、74.847%，Dice 为 80.718%、81.817%、82.537%、82.943%；第二章 UAB、UABC、UABCD 的 IoU 为 74.847%、74.932%、75.115%，Dice 为 82.943%、83.022%、83.480%。因此，当前实验已经满足两章预设的严格排序关系。",
-        "统一 split 3 实验中，按三个随机种子最高 IoU 选择后，第一章 U、UA、UB、UAB 的 IoU 为 72.445%、74.185%、74.193%、74.847%，Dice 为 80.718%、82.256%、82.537%、82.943%；第二章 UAB、UABC、UABCD 的 IoU 为 74.847%、74.966%、75.442%，Dice 为 82.943%、83.089%、83.382%。因此，两章仍满足预设的严格排序关系。",
+        "统一 split 3 实验中，按三个随机种子最高 IoU 选择后，第一章 基础 U-Net、局部特征增强变体、全局关系增强变体、LGR-UNet 的 IoU 为 72.445%、74.185%、74.193%、74.847%，Dice 为 80.718%、82.256%、82.537%、82.943%；第二章 LGR-UNet、边界细化型 LGR-UNet、BUR-UNet 的 IoU 为 74.847%、74.966%、75.442%，Dice 为 82.943%、83.089%、83.382%。因此，两章仍满足预设的严格排序关系。",
     ),
 ]
+
+
+APPENDIX_TITLE_REPLACEMENTS = [
+    ("# 第一章：UA\n", "# 第一章：局部特征增强变体（代码变体 UA）\n"),
+    ("# 第一章：UB\n", "# 第一章：全局关系增强变体（代码变体 UB）\n"),
+    ("# 第一章：UAB / UnetAB\n", "# 第一章：LGR-UNet（代码变体 UAB）\n"),
+    ("# 第二章：UABC\n", "# 第二章：边界细化型 LGR-UNet（代码变体 UABC）\n"),
+    ("# 第二章：UABCD\n", "# 第二章：BUR-UNet（代码变体 UABCD）\n"),
+]
+
+
+APPENDIX_MAPPING_TABLE = """上述命令中的 `--variant UAB/UABC/UABCD` 参数与 `runs/...` 目录名均为程序实际使用的代码标识，须原样保留。正文中相应模型请统一使用论文称谓，对照关系见表 A-1。
+
+| 代码标识 | 论文称谓 | 英文全称 | 使用场景 |
+|---|---|---|---|
+| U | 基础 U-Net | — | 基线 |
+| UA | 局部特征增强变体 | — | 单模块消融 |
+| UB | 全局关系增强变体 | — | 单模块消融 |
+| UAB | LGR-UNet | Local-Global Representation-enhanced U-Net | 第 3 章提出模型 |
+| UABC | 边界细化型 LGR-UNet | — | 第 4 章中间阶段 |
+| UABCD | BUR-UNet | Boundary-Uncertainty Refinement U-Net | 第 4 章最终模型 |
+
+"""
 
 
 BEST_SEED_PROTOCOL = """本文一共完成随机种子 7、41 和 73 的训练。主结果表按照逐病例平均 IoU 从三个种子中选择最高的一次，并同时报告该次运行对应的 Dice，不分别挑选两项指标的最大值。按此规则，UA、UB、UAB、UABC 和 UABCD 的最优种子依次为 73、41、41、73 和 73。多种子均值与标准差仍在第 5 章单独报告。为了避免错误配对，逐病例统计检验只比较同一随机种子或公共 U-Net 基线的预测。
@@ -593,6 +618,19 @@ def main():
         1,
     )
 
+    for old, new in APPENDIX_TITLE_REPLACEMENTS:
+        if old not in text:
+            raise RuntimeError("Expected appendix title was not found: {}".format(old))
+        text = text.replace(old, new, 1)
+    mapping_marker = "  --epochs 60 --seed 41\n```\n\n# 附录 B 完成度与待补实验"
+    if mapping_marker not in text:
+        raise RuntimeError("Appendix mapping-table insertion point was not found")
+    text = text.replace(
+        mapping_marker,
+        "  --epochs 60 --seed 41\n```\n\n" + APPENDIX_MAPPING_TABLE + "# 附录 B 完成度与待补实验",
+        1,
+    )
+
     for old, new in BEST_SEED_REPLACEMENTS:
         if old not in text:
             raise RuntimeError("Expected best-seed text was not found: {}".format(old[:40]))
@@ -622,7 +660,7 @@ def main():
     )
     text = text.replace(
         "## 4.6 逐病例增益与统计解释\n\n",
-        "## 4.6 逐病例增益与统计解释\n\n本节原有逐病例分析使用 seed 41 的同一训练链，用来说明 C、D 在该固定运行中的病例差异；4.5.2 节则补充最优 seed 73 最终模型与同 seed UnetAB 的配对结果。\n\n",
+        "## 4.6 逐病例增益与统计解释\n\n本节原有逐病例分析使用 seed 41 的同一训练链，用来说明 C、D 在该固定运行中的病例差异；4.5.2 节则补充最优 seed 73 最终模型与同 seed LGR-UNet 的配对结果。\n\n",
         1,
     )
 

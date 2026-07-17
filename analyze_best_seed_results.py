@@ -2,16 +2,24 @@ import csv
 import json
 from pathlib import Path
 
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy.stats import wilcoxon
 
 
 ROOT = Path(__file__).resolve().parent
 FIGURE_DIR = ROOT / "thesis_artifacts" / "figures"
 TABLE_DIR = ROOT / "thesis_artifacts" / "tables"
 MULTISEED_CSV = ROOT / "thesis_artifacts" / "multiseed" / "per_seed_metrics.csv"
+
+
+# Paper-facing display labels for the code variants (figures use a Latin font).
+DISPLAY = {
+    "U": "U-Net", "UA": "U+A", "UB": "U+B",
+    "UAB": "LGR-UNet", "UABC": "LGR-UNet+C", "UABCD": "BUR-UNet",
+}
 
 
 EVALUATIONS = {
@@ -46,7 +54,7 @@ def plot_group(best, models, title, output_name):
     bars_dice = axis.bar(positions + width / 2, dice, width, label="Dice", color="#f28e2b")
     axis.set_title(title, fontsize=16)
     axis.set_ylabel("Score (%)")
-    axis.set_xticks(positions, models)
+    axis.set_xticks(positions, [DISPLAY.get(model, model) for model in models])
     axis.set_ylim(70.5, 85.0)
     axis.grid(axis="y", alpha=0.28)
     axis.legend()
@@ -66,6 +74,8 @@ def load_aligned(left_path, right_path):
 
 
 def paired_statistics():
+    from scipy.stats import wilcoxon
+
     comparisons = (
         ("chapter1_UAB_seed41_vs_U", EVALUATIONS[(41, "UAB")], EVALUATIONS[(41, "U")]),
         ("chapter1_UAB_seed41_vs_UB_seed41", EVALUATIONS[(41, "UAB")], EVALUATIONS[(41, "UB")]),
